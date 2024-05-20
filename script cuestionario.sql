@@ -12,13 +12,21 @@ LIMIT 5;
  
 SELECT * FROM Pregunta_1;
 
---5.Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).
+--5. Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).
 
---SELECT tickets.ticket_no,tickets.book_ref,tickets.passenger_id, ticket_flights.ticket_no,ticket_flights.flight_id,ticket_flights.fare_conditions,ticket_flights.amount, flights.*
---FROM tickets
---INNER JOIN ticket_flights 
---ON tickets.ticket_no = ticket_flights.ticket_no
---INNER JOIN flights ON ticket_flights.flight_id = flights.flight_id
---GROUP BY fare_conditions;
+CREATE VIEW PREGUNTA_5 AS 
+SELECT boarding_passes.flight_id AS 'ID_VUELO', 
+		COUNT(boarding_passes.seat_no) AS 'NUMERO DE ASIENTOS OCUPADOS', 
+		flights.scheduled_departure AS 'FECHA Y HORA DE SALIDA',
+		flights.departure_airport AS 'AEROPUERTO DE SALIDA', 
+		flights.scheduled_arrival AS 'FECHA Y HORA DE LLEGADA',
+		flights.arrival_airport AS 'AEROPUERTO DE LLEGADA'
+	FROM boarding_passes
+	INNER JOIN flights ON boarding_passes.flight_id = flights.flight_id
+	GROUP BY boarding_passes.flight_id
+	ORDER BY COUNT(boarding_passes.seat_no) DESC
+	LIMIT 10;
+	
+	SELECT * FROM PREGUNTA_5;
 
 

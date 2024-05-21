@@ -12,6 +12,44 @@ LIMIT 5;
  
 SELECT * FROM Pregunta_1;
 
+--2. Calcular las estadísticas básicas de los tickets dado su tipo
+CREATE VIEW Pregunta_2 AS 
+SELECT fare_conditions AS 'Tipo de ticket', 
+	   COUNT(fare_conditions) AS 'Frecuencia del tipo de ticket',
+	   COUNT(*) AS 'Frecuencia', 
+	   ROUND(AVG(amount),2) AS 'Precio Promedio',
+	   SUM(amount) AS 'Suma del precio',
+	   MAX(amount) AS 'Precio Maximo', 
+	   MIN(AMOUNT) AS 'Precio minimo',
+	   MAX(amount) - MIN(amount) AS 'Rango'
+FROM ticket_flights
+GROUP BY fare_conditions
+ORDER BY Frecuencia DESC;
+
+SELECT * FROM Pregunta_2;
+
+--3. Calcular las estadísticas básicas de los tickets dado el aeropuerto de destino.
+
+SELECT ticket_flights.fare_conditions AS 'Condiciones de vuelo',
+	ticket_flights.amount AS 'monto de viaje',
+	flights.scheduled_arrival, 
+	flights.arrival_airport,
+	COUNT(fare_conditions) AS 'Frecuencia del tipo de ticket',
+	   COUNT(*) AS 'Frecuencia', 
+	   ROUND(AVG(amount),2) AS 'Precio Promedio',
+	   SUM(amount) AS 'Suma del precio',
+	   MAX(amount) AS 'Precio Maximo', 
+	   MIN(AMOUNT) AS 'Precio minimo',
+	   MAX(amount) - MIN(amount) AS 'Rango'
+FROM ticket_flights
+INNER JOIN flights
+ON ticket_flights.flight_id = flights.flight_id
+GROUP BY arrival_airport
+ORDER BY arrival_airport ASC;
+
+
+
+
 --5. Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).
 
 CREATE VIEW PREGUNTA_5 AS 

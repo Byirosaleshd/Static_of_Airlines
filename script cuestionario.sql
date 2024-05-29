@@ -1,7 +1,11 @@
 --1. Indicar los aeropuertos de llegada con mayor frecuencia.
 
 CREATE VIEW Pregunta_1 AS
-SELECT count(flights.arrival_airport) AS 'Frecuencia de llegada', airports_data.airport_name AS 'Nombre del Aeropuerto', flights.arrival_airport AS 'Aeropuerto', flights.status AS 'Estado'
+SELECT count(flights.arrival_airport) AS 'Frecuencia de llegada',
+ 	json_extract(airport_name, '$.en') AS 'Nombre en ingles',
+	json_extract(airport_name, '$.ru') AS 'Nombre en ruso',
+ flights.arrival_airport AS 'Aeropuerto',
+ flights.status AS 'Estado'
 FROM flights 
 INNER JOIN airports_data 
 ON flights.arrival_airport = airports_data.airport_code
@@ -9,7 +13,7 @@ WHERE status='Arrived'
 GROUP BY arrival_airport
 ORDER BY count(arrival_airport) DESC
 LIMIT 5;
- 
+
 SELECT * FROM Pregunta_1;
 
 --2. Calcular las estadísticas básicas de los tickets dado su tipo
@@ -30,10 +34,11 @@ SELECT * FROM Pregunta_2;
 
 --3. Calcular las estadísticas básicas de los tickets dado el aeropuerto de destino.
 
+CREATE VIEW Pregunta_3 AS
 SELECT ticket_flights.fare_conditions AS 'Condiciones de vuelo',
 	ticket_flights.amount AS 'monto de viaje',
-	flights.scheduled_arrival, 
-	flights.arrival_airport,
+--	flights.scheduled_arrival, 
+	flights.arrival_airport AS 'Aeropuerto de llegada',
 	COUNT(fare_conditions) AS 'Frecuencia del tipo de ticket',
 	   COUNT(*) AS 'Frecuencia', 
 	   ROUND(AVG(amount),2) AS 'Precio Promedio',
@@ -47,7 +52,7 @@ ON ticket_flights.flight_id = flights.flight_id
 GROUP BY arrival_airport
 ORDER BY arrival_airport ASC;
 
-
+SELECT * FROM Pregunta_3
 
 
 --5. Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).
@@ -65,6 +70,6 @@ SELECT boarding_passes.flight_id AS 'ID_VUELO',
 	ORDER BY COUNT(boarding_passes.seat_no) DESC
 	LIMIT 10;
 	
-	SELECT * FROM PREGUNTA_5;
+SELECT * FROM PREGUNTA_5;
 
 

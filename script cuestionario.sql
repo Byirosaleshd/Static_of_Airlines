@@ -48,14 +48,19 @@ GROUP BY arrival_airport
 ORDER BY arrival_airport ASC;
 
 --4. Se requiere calcular la distancia en KM de los distintos aeropuertos que existen en la base de datos y con esta nueva variable mostrar las estadísticas básicas con respecto a la distancia de los vuelos.
-SELECT departure_airport,arrival_airport,airport_name,status,airport_code,ROUND(Distancia_km,2) AS 'Distancia en km',
-	   ROUND(AVG(Distancia_km),2) AS 'Distancia Promedio en km',
-	   ROUND(SUM(Distancia_km),2) AS 'Suma de la distancia en km',
-	   ROUND(MAX(Distancia_km),2) AS 'Maxima distancia en km', 
-	   ROUND(MIN(Distancia_km),2) AS 'Minima distancia en km',
-	   ROUND(MAX(Distancia_km) - MIN(Distancia_km),2) AS 'Rango de la distancia'
-FROM Distancia
-GROUP BY departure_airport;
+CREATE VIEW Pregunta_4 AS
+SELECT departure_airport,Distancia_km_llegada - Distancia_km_salida AS 'Distancia_recorrida_en _km', 
+arrival_airport, ROUND(Distancia_km_salida,2) AS 'Distancia en km salida',
+ROUND(Distancia_km_llegada,2) AS 'Distancia en km llegada',
+	   ROUND(AVG(Distancia_km_llegada - Distancia_km_salida),2) AS 'Distancia Promedio en km',
+	   ROUND(SUM(Distancia_km_llegada - Distancia_km_salida),2) AS 'Suma de la distancia en km',
+	   ROUND(MAX(Distancia_km_llegada - Distancia_km_salida),2) AS 'Maxima distancia en km', 
+	   ROUND(MIN(Distancia_km_llegada - Distancia_km_salida),2) AS 'Minima distancia en km',
+	   ROUND(MAX(Distancia_km_llegada - Distancia_km_salida) - MIN(Distancia_km_llegada - Distancia_km_salida),2) AS 'Rango de la distancia'
+  From Distancia
+GROUP BY departure_airport
+ORDER BY 'Distancia_recorrida_en_km' DESC
+Limit 10;
 
 --5. Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).
 

@@ -1,5 +1,2 @@
-
-data/travel.sqlite
-test.py
-data/archive.zip
-travel.sqlite
+.data/archive.zip
+.data/travel.sqlite

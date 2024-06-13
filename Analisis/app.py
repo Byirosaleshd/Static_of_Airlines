@@ -3,6 +3,7 @@ import pandas    as pd
 import seaborn   as sns
 import matplotlib.pyplot as plt
 import sqlite3 as sql
+import numpy as np
 import Functions as ft
 
 # Título de la aplicación
@@ -77,11 +78,50 @@ st.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es
 #st.write(conn.head(5))
 
 # Mostrar estadísticas básicas
-st.write("Estadísticas descriptivas:")
-st.write(iris.describe())
+#st.write("Estadísticas descriptivas:")
+#st.write(iris.describe())
+
+
+sillas = "SELECT a.aircraft_code AS 'CodigodeAvion', SUM(CASE WHEN s.fare_conditions = 'Economy' THEN 1 ELSE 0 END) AS 'Economy', SUM(CASE WHEN s.fare_conditions = 'Business' THEN 1 ELSE 0 END) AS 'Business', SUM(CASE WHEN s.fare_conditions = 'Comfort' THEN 1 ELSE 0 END) AS 'Comfort' FROM aircrafts_data a LEFT JOIN seats s ON a.aircraft_code = s.aircraft_code GROUP BY a.aircraft_code ORDER BY SUM(CASE WHEN s.fare_conditions = 'Economy' THEN 1 ELSE 0 END) DESC;"
+
+df_sillas = pd.read_sql_query(sql = sillas, con = conn)
+st.write(df_sillas)
+
+#definir variables
+
+labels = df_sillas.CodigodeAvion
+Economy = df_sillas.Economy
+Business = df_sillas.Business
+Comfort = df_sillas.Comfort
+
+x = np.arange(len(labels))
+width = 0.25
+
+fig, ax = plt.subplots()
+barra1 = ax.bar(x-0.30, Economy, width, label='Economy', color='#87CEFA')
+barra2 = ax.bar(x, Business, width, label='Business', color='#4169E1')
+barra3 = ax.bar(x+0.30, Comfort, width, label='Comfort', color='#1E90FF')
+
+ax.set_ylabel('Asientos Vendidos')
+ax.set_xlabel('Código de Avion')
+ax.set_title('ASIENTOS VENDIDOS POR AVION')
+ax.set_xticks(x, labels)
+
+ax.legend()
+
+ax.bar_label(barra1, padding=1)
+ax.bar_label(barra2, padding=1)
+ax.bar_label(barra3, padding=1)
+
+ax.set_ylim(0,350)
+fig.tight_layout()
+
+plt.show()
+
+st.pyplot(fig)
 
 # Seleccionar una característica para el gráfico de barras
-feature = st.selectbox("Selecciona una característica para el gráfico de barras", iris.columns[:-1])
+# feature = st.selectbox("Selecciona una característica para el gráfico de barras", iris.columns[:-1])
 
 # Gráfico de barras
 st.write(f"Gráfico de barras de {feature}:")

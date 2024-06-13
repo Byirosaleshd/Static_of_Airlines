@@ -26,11 +26,18 @@ SELECT fare_conditions AS 'Tipo de ticket',
 	   MAX(amount) AS 'Precio Maximo', 
 	   MIN(AMOUNT) AS 'Precio minimo',
 	   MAX(amount) - MIN(amount) AS 'Rango'
+	   ROUND((amount - (SELECT AVG(amount) FROM ticket_flights)) * (amount - (SELECT AVG(amount) FROM ticket_flights))/(SELECT COUNT(fare_conditions) FROM ticket_flights)) AS Varianza,
 FROM ticket_flights
 GROUP BY fare_conditions
 ORDER BY 'Frecuencia del tipo de ticket' DESC;
 
 SELECT * FROM Pregunta_2;
+
+CREATE VIEW Pregunta_2_2 AS
+SELECT *, SQRT(Varianza) AS 'Desviación tipica', (SQRT(Varianza)/Precio_Promedio) * 100 AS 'Coeficiente_de_variacion' FROM Pregunta_2;
+
+
+SELECT * FROM Pregunta_2_2;
 
 
 
@@ -39,17 +46,21 @@ SELECT * FROM Pregunta_2;
 CREATE VIEW Pregunta_3 AS
 SELECT fare_conditions AS 'Tipo de ticket', 
         COUNT(fare_conditions) AS 'Frecuencia del tipo de ticket',
-        ROUND(AVG(amount),2) AS 'Precio_Promedio',
+        ROUND(AVG(amount),2) AS Precio_Promedio,
         SUM(amount) AS 'Sum_precio',
         MAX(amount) AS 'Precio Maximo', 
         MIN(AMOUNT) AS 'Precio minimo', 
-        ROUND((amount - (SELECT AVG(amount) FROM ticket_flights)) * (amount - (SELECT AVG(amount) FROM ticket_flights))/(SELECT COUNT(fare_conditions) FROM ticket_flights),4)  AS 'Varianza'
+		MAX(amount) - MIN(amount) AS 'Rango'
+        ROUND((amount - (SELECT AVG(amount) FROM ticket_flights)) * (amount - (SELECT AVG(amount) FROM ticket_flights))/(SELECT COUNT(fare_conditions) FROM ticket_flights)) AS Varianza,
 FROM ticket_flights
-GROUP BY fare_conditions
-ORDER BY fare_conditions DESC;
+INNER JOIN flights
+ON ticket_flights.flight_id = flights.flight_id
+GROUP BY arrival_airport
+ORDER BY arrival_airport ASC;
 
 CREATE VIEW Pregunta_3_2 AS
-SELECT *, SQRT(Varianza) AS 'Desviación tipica', SQRT(Varianza)/Precio_Promedio * 100 AS 'Coeficiente de variacion' FROM Pregunta_3;
+SELECT *, SQRT(Varianza) AS 'Desviación tipica', (SQRT(Varianza)/Precio_Promedio) * 100 AS 'Coeficiente_de_variacion' FROM Pregunta_3;
+
 
 SELECT * FROM Pregunta_3_2;
 
@@ -70,6 +81,9 @@ ORDER BY 'Distancia_recorrida_en_km' DESC
 Limit 10;
 
 SELECT * FROM Pregunta_4
+
+
+SELECT *,strftime('%H',Time(scheduled_departure)) FROM flights;
 
 
 --5. Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).

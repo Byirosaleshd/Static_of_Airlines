@@ -98,6 +98,37 @@ plt.show()
 
 st.pyplot(fig)
 
+Pregunta_E2 = '''SELECT  aircraft_code AS 'Codigo de Avion', status AS Estado , count(fare_conditions) AS Frecuencia , fare_conditions AS 'Tipo de Ticket'
+FROM flights 
+INNER JOIN ticket_flights ON flights.flight_id = ticket_flights.flight_id
+WHERE status in ('Arrived','On Time') AND aircraft_code IN ('CR2','733','CN1') AND fare_conditions IN ('Business')
+;'''
+
+Df_PreguntaE2 = ft.read_abilities(Pregunta_E2,conn)
+st.write(Df_PreguntaE2)
+print(Df_PreguntaE2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Seleccionar una característica para el gráfico de barras
 # feature = st.selectbox("Selecciona una característica para el gráfico de barras", iris.columns[:-1])
 

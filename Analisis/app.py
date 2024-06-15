@@ -1,13 +1,24 @@
+#Descarga los paquetes necesarios por si alguien no los tiene
+pip install pandas
+pip install sqlite3 
+pip install numpy
+pip install seaborn
+
+#Llamamos las librerias
 import streamlit as st
-import pandas    as pd
-import seaborn   as sns
-import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns 
+import matplotlib.pyplot as plt #Graficos
+import seaborn as sns #Graficos
 import sqlite3 as sql
-import numpy as np
+import numpy as np # Algebra lineal
 import Functions as ft
 import datetime as dt
 from pandas import json_normalize
 import json
+
+# Conectar a la base de datos SQLite
+conn = sql.connect('../.data/travel.sqlite') 
 
 # Título de la aplicación
 st.title("Determinar el mejor modelo de avión para vuelos más eficientes en distintos aeropuertos")
@@ -26,8 +37,7 @@ E.	Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conoce
 1	El promedio y la variabilidad de los vuelos realizados.
 2   ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?"
 """)
-# Cargar la base de datos
-conn = sql.connect('../.data/travel.sqlite') 
+
 
 st.write('# ¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?')
 
@@ -98,6 +108,135 @@ plt.show()
 
 st.pyplot(fig)
 
+
+
+
+st.write("Dentro de los modelos de aviones con códigos: 773, 763 y SU9. ¿De cuánto ha sido la variabilidad de precios según el destino y la clase de vuelo?")
+
+PreguntaC = """
+CREATE VIEW Flight_Price_Info AS
+SELECT
+    flights.flight_no,
+    flights.departure_airport,
+    flights.arrival_airport,
+    flights.status,
+    flights.aircraft_code,
+    ticket_flights.amount,
+    ticket_flights.fare_conditions,
+    aircrafts_data.model
+FROM
+    flights
+INNER JOIN
+    aircrafts_data
+ON
+    flights.aircraft_code = aircrafts_data.aircraft_code
+INNER JOIN
+    ticket_flights
+ON
+    flights.flight_id = ticket_flights.flight_id
+WHERE
+    flights.aircraft_code IN ('773', '763', 'SU9');"""
+
+PreguntaC2 = """
+SELECT
+    arrival_airport,
+    fare_conditions,
+    COUNT(amount) AS num_flights,
+    AVG(amount) AS avg_price,
+    MIN(amount) AS min_price,
+    MAX(amount) AS max_price
+FROM
+    Flight_Price_Info
+GROUP BY
+    arrival_airport, fare_conditions
+ORDER BY
+    arrival_airport, fare_conditions;"""
+
+    
+    
+Df_PreguntaC1 = ft.read_abilities(PreguntaC2,conn)
+
+Df_PreguntaC1
+
+st.write("""Si los aviones realizan vuelos entre los continentes de Asia y Europa:
+1	¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?
+2	Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?""")
+
+PreguntaD1 = """CREATE VIEW Flights_Airports AS
+SELECT
+    flights.flight_no,
+    flights.arrival_airport,
+    flights.aircraft_code,
+    airports_data.city
+FROM
+    flights
+INNER JOIN
+    airports_data
+ON
+    flights.arrival_airport = airports_data.airport_code
+WHERE
+    flights.aircraft_code = '763';"""
+
+Pregunta_D1 = """
+SELECT
+    city,
+    COUNT(flight_no) AS num_flights
+FROM
+    Flights_Airports
+GROUP BY
+    city
+ORDER BY
+    num_flights DESC;"""
+
+
+Df_Pregunta_D1 = ft.read_abilities(Pregunta_D1,conn)
+
+Df_Pregunta_D1
+
+
+
+
+PreguntaD = """CREATE VIEW European_To_Asian_Flights AS
+SELECT
+    flights.flight_no,
+    flights.departure_airport,
+    flights.arrival_airport,
+    dep_airports.city AS dep_city,
+    arr_airports.city AS arr_city,
+    dep_airports.timezone AS dep_timezone,
+    arr_airports.timezone AS arr_timezone
+FROM
+    flights
+INNER JOIN
+    airports_data AS dep_airports
+ON
+    flights.departure_airport = dep_airports.airport_code
+INNER JOIN
+    airports_data AS arr_airports
+ON
+    flights.arrival_airport = arr_airports.airport_code
+WHERE
+    dep_airports.timezone LIKE 'Europe/%'
+AND
+    arr_airports.timezone LIKE 'Asia/%';"""
+
+PreguntaD2= """ 
+SELECT
+    arr_city AS asian_city,
+    COUNT(flight_no) AS num_flights
+FROM
+    European_To_Asian_Flights
+GROUP BY
+    arr_city
+ORDER BY
+    num_flights DESC;"""
+
+Df_PreguntaD2 = ft.read_abilities(PreguntaD2,conn)
+
+Df_PreguntaD2
+
+
+
 Pregunta_E2 = '''SELECT  aircraft_code AS 'Codigo de Avion', status AS Estado , count(fare_conditions) AS Frecuencia , fare_conditions AS 'Tipo de Ticket'
 FROM flights 
 INNER JOIN ticket_flights ON flights.flight_id = ticket_flights.flight_id
@@ -133,29 +272,30 @@ print(Df_PreguntaE2)
 # feature = st.selectbox("Selecciona una característica para el gráfico de barras", iris.columns[:-1])
 
 # Gráfico de barras
-st.write(f"Gráfico de barras de {feature}:")
-st.area_chart(iris[feature])
+# st.write(f"Gráfico de barras de {feature}:")
+# st.area_chart(iris[feature])
 
 # Filtro por tipo de flor
-species       = st.multiselect("Selecciona especies de Iris", iris['species'].unique(), iris['species'].unique())
-filtered_iris = iris[iris['species'].isin(species)]
+# species       = st.multiselect("Selecciona especies de Iris", iris['species'].unique(), iris['species'].unique())
+# filtered_iris = iris[iris['species'].isin(species)]
 
-st.write(f"Datos filtrados por especies {species}:")
-st.write(filtered_iris)
+# st.write(f"Datos filtrados por especies {species}:")
+# st.write(filtered_iris)
 
 # Gráfico de dispersión
-st.write("Gráfico de dispersión (Largo de tallo vs Ancho de tallo):")
-fig, ax = plt.subplots()
-sns.scatterplot(data=filtered_iris, x='sepal_length', y='sepal_width', hue='species', ax=ax)
-st.pyplot(fig)
+# st.write("Gráfico de dispersión (Largo de tallo vs Ancho de tallo):")
+# fig, ax = plt.subplots()
+# sns.scatterplot(data=filtered_iris, x='sepal_length', y='sepal_width', hue='species', ax=ax)
+# st.pyplot(fig)
 
 # Gráfico de pares (pairplot)
-st.write("Gráfico de pares de las características Iris:")
-fig = sns.pairplot(filtered_iris, hue='species')
-st.pyplot(fig)
+# st.write("Gráfico de pares de las características Iris:")
+# fig = sns.pairplot(filtered_iris, hue='species')
+# st.pyplot(fig)
 
-st.set_page_config(page_title="Statics_of_airlines", page_icon="🤖", layout="wide")
+# st.set_page_config(page_title="Statics_of_airlines", page_icon="🤖", layout="wide")
 
-with st.container():
-    st.subheader("Hola, :wave:")
+#with st.container():
+#    st.subheader("Hola, :wave:")
 
+conn.close()

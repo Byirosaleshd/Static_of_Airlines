@@ -11,10 +11,13 @@ import datetime as dt
 from pandas import json_normalize
 import json
 import Sql as s    
+from PIL import Image
+
 
 
 # Conectar a la base de datos SQLite
 conn = sql.connect('../.data/travel.sqlite') 
+
 
 # Título de la aplicación
 st.title("Determinar el mejor modelo de avión para vuelos más eficientes en distintos aeropuertos")
@@ -24,13 +27,15 @@ st.write("#### ¿Qué modelo de avión realiza una mayor cantidad de vuelos, y c
 Pregunta_A = s.Pregunta_A
 Df_PreguntaA = ft.read_abilities(Pregunta_A,conn)
 ft.caracteristicas_modelo(Df_PreguntaA, 'scheduled_departure', 'scheduled_arrival','model')
-
+st.line_chart(Df_PreguntaA, x="scheduled_departure", y="model")
 
 st.write("#### ¿Qué modelo de avión ha vendido en promedio una mayor cantidad de puestos según la clase del vuelo?")
 
-ft.imprimir_tabla('sillas',conn,'df_sillas','sillas')
+#ft.imprimir_tabla('sillas',conn,'df_sillas','sillas')
 
-
+sillas = s.sillas
+df_sillas = ft.read_abilities(sillas,conn)
+st.write(df_sillas)
 ft.Grafico_multibarras(df_sillas,'Economy','Business','Comfort',"Economy","Business","Comfort","Asientos Vendidos","Código de Avion","ASIENTOS VENDIDOS POR AVION")
 
 
@@ -38,6 +43,22 @@ st.write("#### Dentro de los modelos de aviones con códigos: 773, 763 y SU9. ¿
 PreguntaC2 = s.PreguntaC2    
 Df_PreguntaC1 = ft.read_abilities(PreguntaC2,conn)
 Df_PreguntaC1
+
+
+
+
+
+st.write("#### Contexto de la pregunta para posterior resolucion: dentro de los modelos previstos se necesita la variabilidades de los precios segun el destino y la clase de vuelo de cada clase de avion")
+
+
+
+
+
+
+
+
+
+
 
 
 st.write("#### Si los aviones realizan vuelos entre los continentes de Asia y Europa: ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?")
@@ -50,8 +71,27 @@ st.bar_chart(Df_Pregunta_D1, x="city", y="num_flights")
 st.write("#### Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?")
 PreguntaD2 = s.PreguntaD2
 Df_PreguntaD2 = ft.read_abilities(PreguntaD2,conn)
-Df_PreguntaD2
-st.area_chart(Df_PreguntaD2, x="asian_city", y="num_flights", color="#FF0000")
+Df_PreguntaD2["asian_city"] = Df_PreguntaD2["asian_city"].apply(json.loads)
+Df_PreguntaD2[["city_en", "city_ru"]] = Df_PreguntaD2["asian_city"].apply(lambda x: pd.Series([x["en"], x["ru"]]))
+Df_PreguntaD2 = Df_PreguntaD2.drop("asian_city", axis=1)
+Df_PreguntaD2 = Df_PreguntaD2[["city_en","city_ru","num_flights"]]
+Df_PreguntaD2["Numero de vuelos"] = Df_PreguntaD2["num_flights"] 
+Df_PreguntaD2 = Df_PreguntaD2.drop("num_flights", axis=1)
+Df_PreguntaD2["Ciudad en ingles"] = Df_PreguntaD2["city_en"]
+Df_PreguntaD2["Ciudad en ruso"] = Df_PreguntaD2["city_ru"]
+Df_PreguntaD2 = Df_PreguntaD2.drop("city_en", axis=1)
+Df_PreguntaD2 = Df_PreguntaD2.drop("city_ru", axis=1)
+Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
+Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
+st.write(Df_PreguntaD2)
+#st.bar_chart(Df_PreguntaD2, x="Ciudad en ingles", y="Numero de vuelos", color="#FF0000")
+
+
+
+#colunas=['aircraft_code','flight_id','flight_no','scheduled_departure','scheduled_arrival','departure_airport','arrival_airport','status','model_en','actual_departure','actual_arrival']
+#new_voos_list = pd.merge (voos,aeronaves, on='aircraft_code', how='inner')[colunas]
+#new_voos_list
+
 
 
 st.write("#### Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente: El promedio y la variabilidad de los vuelos realizados.")

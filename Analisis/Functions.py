@@ -96,7 +96,7 @@ def Grafico_multibarras(df,tipo1,tipo2,tipo3,label1:str,label2:str,label3:str,yl
     ax.set_ylim(0,350)
     fig.tight_layout()
     plt.show()
-    st.pyplot(fig)
+    return st.pyplot(fig)
     
     
  #que va despues de la s?   

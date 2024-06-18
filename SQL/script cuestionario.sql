@@ -1,11 +1,12 @@
 --1. Indicar los aeropuertos de llegada con mayor frecuencia.
 
 CREATE VIEW Pregunta_1 AS
-SELECT count(flights.arrival_airport) AS 'Frecuencia de llegada',
+SELECT 
  	json_extract(airport_name, '$.en') AS 'Nombre en ingles',
 	json_extract(airport_name, '$.ru') AS 'Nombre en ruso',
- flights.arrival_airport AS 'Aeropuerto',
- flights.status AS 'Estado'
+ flights.arrival_airport AS 'Codigo de Aeropuerto',
+ flights.status AS 'Estado',
+ count(*) AS 'Frecuencia de llegada'
 FROM flights 
 INNER JOIN airports_data 
 ON flights.arrival_airport = airports_data.airport_code
@@ -20,21 +21,33 @@ SELECT * FROM Pregunta_1;
 --2. Calcular las estadísticas básicas de los tickets dado su tipo
 CREATE VIEW Pregunta_2 AS 
 SELECT fare_conditions AS 'Tipo de ticket', 
-	   COUNT(fare_conditions) AS 'Frecuencia del tipo de ticket', 
-	   ROUND(AVG(amount),2) AS 'Precio Promedio',
+	   COUNT(fare_conditions) AS 'Frecuencia', 
 	   SUM(amount) AS 'Suma del precio',
 	   MAX(amount) AS 'Precio Maximo', 
 	   MIN(AMOUNT) AS 'Precio minimo',
-	   MAX(amount) - MIN(amount) AS 'Rango'
+	   MAX(amount) - MIN(amount) AS 'Rango',
+	   ROUND(AVG(amount),2) AS Price_Promedio,
 	   ROUND((amount - (SELECT AVG(amount) FROM ticket_flights)) * (amount - (SELECT AVG(amount) FROM ticket_flights))/(SELECT COUNT(fare_conditions) FROM ticket_flights)) AS Varianza,
+	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) AS Varianza2,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Varianza3,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Varianza4,
+	   SQRT(
+	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) 
+		) AS Desviacion_tipica
 FROM ticket_flights
 GROUP BY fare_conditions
-ORDER BY 'Frecuencia del tipo de ticket' DESC;
+ORDER BY 'Frecuencia' DESC;
 
 SELECT * FROM Pregunta_2;
 
 CREATE VIEW Pregunta_2_2 AS
-SELECT *, SQRT(Varianza) AS 'Desviación tipica', (SQRT(Varianza)/Precio_Promedio) * 100 AS 'Coeficiente_de_variacion' FROM Pregunta_2;
+SELECT *, (Desviacion_tipica/Price_Promedio) * 100 AS 'Coeficiente_de_variacion',
+Varianza3/Varianza2 * Desviacion_tipica AS Simetria,
+Varianza4/Varianza2 * Varianza2 AS KURTOSIS
+FROM Pregunta_2;
+
+
+
 
 
 SELECT * FROM Pregunta_2_2;
@@ -68,8 +81,10 @@ limit 10
 
 
 
+-- Calculate the mean of average_distance_km
 SELECT AVG(average_distance_km) AS avg_distance FROM FLIGHT_GEO_TICKET_2;
 
+-- Calculate the mean of amount
 SELECT AVG(amount) AS avg_amount FROM FLIGHT_GEO_TICKET_2;
 
 -- Calculate the numerator
@@ -245,6 +260,10 @@ FROM (
 ) AS distances
 GROUP BY distance_range
 ORDER BY distance_range;
+
+
+
+
 
 
 

@@ -20,74 +20,80 @@ SELECT * FROM Pregunta_1;
 
 --2. Calcular las estadísticas básicas de los tickets dado su tipo
 CREATE VIEW Pregunta_2 AS 
-SELECT fare_conditions AS 'Tipo de ticket', 
-	   COUNT(fare_conditions) AS 'Frecuencia', 
-	   SUM(amount) AS 'Suma del precio',
-	   MAX(amount) AS 'Precio Maximo', 
-	   MIN(AMOUNT) AS 'Precio minimo',
-	   MAX(amount) - MIN(amount) AS 'Rango',
-	   ROUND(AVG(amount),2) AS Price_Promedio,
-	   ROUND((amount - (SELECT AVG(amount) FROM ticket_flights)) * (amount - (SELECT AVG(amount) FROM ticket_flights))/(SELECT COUNT(fare_conditions) FROM ticket_flights)) AS Varianza,
-	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) AS Varianza2,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Varianza3,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Varianza4,
+SELECT Tipo_de_ticket AS 'Tipo de ticket',
+	   Frecuencia,
+	   Suma_del_precio AS 'Suma del Precio',
+	   Precio_Maximo AS 'Precio Maximo',
+	   Precio_Minimo AS 'Precio Minimo',
+	   Rango,
+	   Precio_Promedio AS 'Precio Promedio',
+	   Varianza,
+	   Desviacion_tipica,
+(Desviacion_tipica/Precio_Promedio) * 100 AS 'Coeficiente de variacion de Pearson',
+	Momento3/Varianza * Desviacion_tipica AS Simetria,
+	Desviacion4/Varianza * Varianza AS KURTOSIS
+	FROM 
+(SELECT fare_conditions AS Tipo_de_ticket, 
+	   COUNT(fare_conditions) AS Frecuencia, 
+	   SUM(amount) AS Suma_del_precio,
+	   MAX(amount) AS Precio_Maximo, 
+	   MIN(AMOUNT) AS Precio_minimo,
+	   MAX(amount) - MIN(amount) AS Rango,
+	   ROUND(AVG(amount),2) AS Precio_Promedio,
+	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) AS Varianza,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion3,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion4,
 	   SQRT(
-	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) 
-		) AS Desviacion_tipica
+	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) 
+		) AS Desviacion_tipica,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento3
 FROM ticket_flights
 GROUP BY fare_conditions
-ORDER BY 'Frecuencia' DESC;
+ORDER BY Frecuencia DESC)
 
-SELECT * FROM Pregunta_2;
-
-CREATE VIEW Pregunta_2_1 AS
-SELECT *, (Desviacion_tipica/Price_Promedio) * 100 AS 'Coeficiente_de_variacion',
-Varianza3/Varianza2 * Desviacion_tipica AS Simetria,
-Varianza4/Varianza2 * Varianza2 AS KURTOSIS
-FROM Pregunta_2;
-
-
-SELECT * FROM Pregunta_2_1;
-
-
-
+SELECT * FROM Pregunta_2
 
 
 --3. Calcular las estadísticas básicas de los tickets dado el aeropuerto de destino.
-
 CREATE VIEW Pregunta_3 AS
-SELECT fare_conditions AS 'Tipo de ticket', 
-        COUNT(fare_conditions) AS 'Frecuencia del tipo de ticket',
-        ROUND(AVG(amount),2) AS Precio_Promedio,
-        SUM(amount) AS 'Sum_precio',
-        MAX(amount) AS 'Precio Maximo', 
-        MIN(AMOUNT) AS 'Precio minimo', 
-		MAX(amount) - MIN(amount) AS 'Rango',
-        ROUND((amount - (SELECT AVG(amount) FROM ticket_flights)) * (amount - (SELECT AVG(amount) FROM ticket_flights))/(SELECT COUNT(fare_conditions) FROM ticket_flights)) AS Varianza,
-	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) AS Varianza2,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Varianza3,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Varianza4,
+SELECT arrival_airport AS 'Aeropuerto de destino',
+	   Tipo_de_ticket AS 'Tipo de ticket',
+	   Frecuencia,
+	   Suma_del_precio AS 'Suma del Precio',
+	   Precio_Maximo AS 'Precio Maximo',
+	   Precio_Minimo AS 'Precio Minimo',
+	   Rango,
+	   Precio_Promedio AS 'Precio Promedio',
+	   ROUND(Varianza) AS Varianza,
+	   ROUND(Desviacion_tipica) AS 'Desviacion tipica',
+	(Desviacion_tipica/Precio_Promedio) * 100 AS 'Coeficiente de variacion de Pearson',
+	ROUND(Momento3/Varianza * Desviacion_tipica) AS Simetria,
+	ROUND(Desviacion4/Varianza * Varianza) AS KURTOSIS
+	FROM 
+(SELECT arrival_airport,
+	   fare_conditions AS Tipo_de_ticket, 
+	   COUNT(fare_conditions) AS Frecuencia, 
+	   SUM(amount) AS Suma_del_precio,
+	   MAX(amount) AS Precio_Maximo, 
+	   MIN(AMOUNT) AS Precio_minimo,
+	   MAX(amount) - MIN(amount) AS Rango,
+	   ROUND(AVG(amount),2) AS Precio_Promedio,
+	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) AS Varianza,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion3,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion4,
 	   SQRT(
-	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) 
-		) AS Desviacion_tipica
+	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) 
+		) AS Desviacion_tipica,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento3
 FROM ticket_flights
 INNER JOIN flights
 ON ticket_flights.flight_id = flights.flight_id
 GROUP BY arrival_airport
-ORDER BY arrival_airport ASC;
-
-SELECT * FROM Pregunta_3;
-
-CREATE VIEW Pregunta_3_1 AS
-SELECT *, (Desviacion_tipica/Precio_Promedio) * 100 AS 'Coeficiente_de_variacion',
-Varianza3/Varianza2 * Desviacion_tipica AS Simetria,
-Varianza4/Varianza2 * Varianza2 AS KURTOSIS
-FROM Pregunta_3;
-
-
-SELECT * FROM Pregunta_3_1;
-
-
+ORDER BY arrival_airport ASC)
+LIMIT 10;
+	  
+	  	  
+SELECT * FROM Pregunta_3;		  
 	  
 --4. Se requiere calcular la distancia en KM de los distintos aeropuertos que existen en la base de datos y con esta nueva variable mostrar las estadísticas básicas con respecto a la distancia de los vuelos.
 CREATE VIEW Pregunta_4 AS

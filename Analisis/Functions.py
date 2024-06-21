@@ -12,11 +12,11 @@ import json
 import Sql as s
 
     
-def load_sql(type:str) -> pd.DataFrame:
-    consulta = f'SELECT name FROM sqlite_master Where type={type} ORDER BY name;'
-    print("Entidades o Vistas en la base de datos:")
-    nombre_tabla = pd.read_sql_query(consulta,conn)
-    return nombre_tabla
+#def load_sql(type:str) -> pd.DataFrame:
+#    consulta = f'SELECT name FROM sqlite_master Where type={type} ORDER BY name;'
+#    print("Entidades o Vistas en la base de datos:")
+#    nombre_tabla = pd.read_sql_query(consulta,conn)
+#    return nombre_tabla
     
 
 def read_abilities(query:str, conector) -> pd.DataFrame:
@@ -24,9 +24,9 @@ def read_abilities(query:str, conector) -> pd.DataFrame:
     return Df_aircrafts_data
 
 
-def load_view_to_dataframe(view_name:str) -> pd.DataFrame:
-    query = f"SELECT * FROM {view_name}"
-    return pd.read_sql_query(query, conn)
+#def load_view_to_dataframe(view_name:str) -> pd.DataFrame:
+#    query = f"SELECT * FROM {view_name}"
+#    return pd.read_sql_query(query, conn)
 
 
 def procesar_vuelos(Df, columna_salida, columna_llegada):
@@ -58,21 +58,7 @@ def caracteristicas_modelo(Df, columna_salida, columna_llegada,nombres):
     Df[columna_llegada] = pd.to_datetime(Df[columna_llegada]).dt.time
     Df = Df[[columna_salida,'hora de salida',columna_llegada,'hora de llegada','departure_airport','arrival_airport','status','aircraft_code','Nombre en ingles','Nombre en ruso','duracion_vuelo']]
     st.write(Df)
-
-def cargar_librerias(nombre_librerias):
-    import streamlit as st
-    import pandas as pd
-    import seaborn as sns 
-    import matplotlib.pyplot as plt #Graficos
-    import seaborn as sns #Graficos
-    import sqlite3 as sql
-    import numpy as np # Algebra lineal
-    import Functions as ft
-    import datetime as dt
-    from pandas import json_normalize
-    import json
-    
-    
+        
     
 def Grafico_multibarras(df,tipo1,tipo2,tipo3,label1:str,label2:str,label3:str,ylabel:str,xlabel:str,title:str):
     labels = df.CodigodeAvion
@@ -99,11 +85,60 @@ def Grafico_multibarras(df,tipo1,tipo2,tipo3,label1:str,label2:str,label3:str,yl
     return st.pyplot(fig)
     
     
- #que va despues de la s?   
-#def imprimir_tabla(nombre_de_consulta, conn, nombre_del_nuevo_dataframe, argumento ):
-    #nombre_de_consulta = s.argumento
-    #nombre_del_nuevo_dataframe = pd.read_sql_query(nombre_de_consulta, con = conn)
-    #st.write(nombre_del_nuevo_dataframe)
+def grafico_pie(df):
+    fig, ax = plt.subplots()
+    aviones = df.Avión
+    frecuencia = ['4674', '4570', '646']
+    explotar = (0.1, 0.05, 0.12)
+    colors = ['#3A95B1', '#7BBFC9', '#BCE4D8']
+    def autopct_fun(frecuencia):
+        gen = iter(frecuencia)
+        return lambda pct: f"{pct:1.0f}% ({next(gen)})"
+
+    plt.pie(frecuencia, labels=aviones, explode=explotar, colors=colors,
+    autopct= autopct_fun(frecuencia),
+    shadow=True, startangle=20,
+    pctdistance=0.6, radius=0.7, labeldistance=1.15)
+
+    plt.show()
+    return st.pyplot(fig)
     
     
-    
+
+def grafico_barras_superpuestas(df):
+    fig, ax = plt.subplots()
+    x = df.Avion
+
+    clase_economy = df.TICKETS_ECONOMY
+    clase_comfort = df.TICKETS_COMFROT
+    clase_business = df.TICKETS_BUSINESS
+    plt.bar(x, clase_economy, 0.4, label = "Economy", color = "#7BBFC9")
+    plt.bar(x, clase_comfort, 0.4, label = "Comfort", color = "#BCE4D8")
+    plt.bar(x, clase_business, 0.4, label = "Business", color = "#3A95B1")
+    # Añadir etiquetas a las barras
+    for i, v in enumerate(clase_economy):
+        plt.text(i, v, str(v), ha='center', va='bottom')
+    # Añadir etiquetas a las barras
+    for i, v in enumerate(clase_business):
+        plt.text(i, v, str(v), ha='center', va='bottom')
+    plt.xlabel("Aviones")
+    plt.ylabel("asientos vendidos")
+    plt.legend()
+    plt.show()
+    return st.pyplot(fig)
+
+
+
+def limpiar_json(df,name_total,name1,name2):
+    Df_PreguntaD2[name_total] = Df_PreguntaD2[name_total].apply(json.loads)
+    Df_PreguntaD2[[name1, name2]] = Df_PreguntaD2[name_total].apply(lambda x: pd.Series([x["en"], x["ru"]]))
+    Df_PreguntaD2 = Df_PreguntaD2.drop(name_total, axis=1)
+    Df_PreguntaD2 = Df_PreguntaD2[["city_en","city_ru","num_flights"]]
+    Df_PreguntaD2["Numero de vuelos"] = Df_PreguntaD2["num_flights"] 
+    Df_PreguntaD2 = Df_PreguntaD2.drop("num_flights", axis=1)
+    Df_PreguntaD2["Ciudad en ingles"] = Df_PreguntaD2["city_en"]
+    Df_PreguntaD2["Ciudad en ruso"] = Df_PreguntaD2["city_ru"]
+    Df_PreguntaD2 = Df_PreguntaD2.drop("city_en", axis=1)
+    Df_PreguntaD2 = Df_PreguntaD2.drop("city_ru", axis=1)
+    Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
+    Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)

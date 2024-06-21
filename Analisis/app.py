@@ -16,7 +16,7 @@ from PIL import Image
 
 
 # Conectar a la base de datos SQLite
-conn = sql.connect('travel.sqlite') 
+conn = sql.connect('../.data/travel.sqlite') 
 
 
 # Título de la aplicación
@@ -42,23 +42,7 @@ ft.Grafico_multibarras(df_sillas,'Economy','Business','Comfort',"Economy","Busin
 st.write("#### Dentro de los modelos de aviones con códigos: 773, 763 y SU9. ¿De cuánto ha sido la variabilidad de precios según el destino y la clase de vuelo?")
 PreguntaC = s.PreguntaC   
 Df_PreguntaC = ft.read_abilities(PreguntaC,conn)
-Df_PreguntaC
-
-
-
-
-
-st.write("#### Contexto de la pregunta para posterior resolucion: dentro de los modelos previstos se necesita la variabilidades de los precios segun el destino y la clase de vuelo de cada clase de avion")
-
-
-
-
-
-
-
-
-
-
+st.write(Df_PreguntaC)
 
 
 st.write("#### Si los aviones realizan vuelos entre los continentes de Asia y Europa: ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?")
@@ -100,26 +84,7 @@ E1 = "SELECT aircraft_code AS 'Avión', count (status) AS 'Frecuencia_de_vuelos_
 Pregunta_E1 = s.E1
 Df_PreguntaE1 = ft.read_abilities(Pregunta_E1, conn)
 st.write(Df_PreguntaE1)
-
-fig, ax = plt.subplots()
-aviones = Df_PreguntaE1.Avión
-frecuencia = ['4674', '4570', '646']
-explotar = (0.1, 0.05, 0.12)
-colors = ['#3A95B1', '#7BBFC9', '#BCE4D8']
-
-def autopct_fun(frecuencia):
-    gen = iter(frecuencia)
-    return lambda pct: f"{pct:1.0f}% ({next(gen)})"
-
-plt.pie(frecuencia, labels=aviones, explode=explotar, colors=colors,
-        autopct= autopct_fun(frecuencia),
-        shadow=True, startangle=20,
-        pctdistance=0.6, radius=0.7, labeldistance=1.15)
-
-plt.show()
-st.pyplot(fig)
-
-
+ft.grafico_pie(Df_PreguntaE1)
 
 
 #st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?")
@@ -134,32 +99,7 @@ st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos r
 Pregunta_E2 = s.E2
 Df_PreguntaE2 = ft.read_abilities(Pregunta_E2, conn)
 st.write(Df_PreguntaE2)
-
-fig, ax = plt.subplots()
-x = Df_PreguntaE2.Avion
-
-clase_economy = Df_PreguntaE2.TICKETS_ECONOMY
-clase_comfort = Df_PreguntaE2.TICKETS_COMFROT
-clase_business = Df_PreguntaE2.TICKETS_BUSINESS
-
-plt.bar(x, clase_economy, 0.4, label = "Economy", color = "#7BBFC9")
-plt.bar(x, clase_comfort, 0.4, label = "Comfort", color = "#BCE4D8")
-plt.bar(x, clase_business, 0.4, label = "Business", color = "#3A95B1")
-
-# Añadir etiquetas a las barras
-for i, v in enumerate(clase_economy):
-    plt.text(i, v, str(v), ha='center', va='bottom')
-# Añadir etiquetas a las barras
-for i, v in enumerate(clase_business):
-    plt.text(i, v, str(v), ha='center', va='bottom')
-
-plt.xlabel("Aviones")
-plt.ylabel("asientos vendidos")
-
-
-plt.legend()
-plt.show()
-st.pyplot(fig)
+ft.grafico_barras_superpuestas(Df_PreguntaE2)
 
 
 

@@ -16,7 +16,7 @@ from PIL import Image
 
 
 # Conectar a la base de datos SQLite
-conn = sql.connect('../.data/travel.sqlite') 
+conn = sql.connect('travel.sqlite') 
 
 
 # Título de la aplicación
@@ -40,9 +40,9 @@ ft.Grafico_multibarras(df_sillas,'Economy','Business','Comfort',"Economy","Busin
 
 
 st.write("#### Dentro de los modelos de aviones con códigos: 773, 763 y SU9. ¿De cuánto ha sido la variabilidad de precios según el destino y la clase de vuelo?")
-PreguntaC2 = s.PreguntaC2    
-Df_PreguntaC1 = ft.read_abilities(PreguntaC2,conn)
-Df_PreguntaC1
+PreguntaC = s.PreguntaC   
+Df_PreguntaC = ft.read_abilities(PreguntaC,conn)
+Df_PreguntaC
 
 
 
@@ -84,8 +84,7 @@ Df_PreguntaD2 = Df_PreguntaD2.drop("city_ru", axis=1)
 Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
 Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
 st.write(Df_PreguntaD2)
-#st.bar_chart(Df_PreguntaD2, x="Ciudad en ingles", y="Numero de vuelos", color="#FF0000")
-
+st.bar_chart(Df_PreguntaD2, x="Ciudad en ingles", y="Numero de vuelos", color="#FF0000")
 
 
 #colunas=['aircraft_code','flight_id','flight_no','scheduled_departure','scheduled_arrival','departure_airport','arrival_airport','status','model_en','actual_departure','actual_arrival']
@@ -97,17 +96,70 @@ st.write(Df_PreguntaD2)
 st.write("#### Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente: El promedio y la variabilidad de los vuelos realizados.")
 
 
+E1 = "SELECT aircraft_code AS 'Avión', count (status) AS 'Frecuencia_de_vuelos_realizados' FROM flights WHERE status IN ('Arrived') AND aircraft_code IN ('CR2','733','CN1') GROUP BY aircraft_code ORDER BY count (status) DESC;"
+Pregunta_E1 = s.E1
+Df_PreguntaE1 = ft.read_abilities(Pregunta_E1, conn)
+st.write(Df_PreguntaE1)
+
+fig, ax = plt.subplots()
+aviones = Df_PreguntaE1.Avión
+frecuencia = ['4674', '4570', '646']
+explotar = (0.1, 0.05, 0.12)
+colors = ['#3A95B1', '#7BBFC9', '#BCE4D8']
+
+def autopct_fun(frecuencia):
+    gen = iter(frecuencia)
+    return lambda pct: f"{pct:1.0f}% ({next(gen)})"
+
+plt.pie(frecuencia, labels=aviones, explode=explotar, colors=colors,
+        autopct= autopct_fun(frecuencia),
+        shadow=True, startangle=20,
+        pctdistance=0.6, radius=0.7, labeldistance=1.15)
+
+plt.show()
+st.pyplot(fig)
+
+
+
+
+#st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?")
+#Pregunta_E2 = s.Pregunta_E2
+#Df_PreguntaE2 = ft.read_abilities(Pregunta_E2,conn)
+#st.write(Df_PreguntaE2)
+#print(Df_PreguntaE2)
+
+
 st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?")
-Pregunta_E2 = s.Pregunta_E2
-Df_PreguntaE2 = ft.read_abilities(Pregunta_E2,conn)
+
+Pregunta_E2 = s.E2
+Df_PreguntaE2 = ft.read_abilities(Pregunta_E2, conn)
 st.write(Df_PreguntaE2)
-print(Df_PreguntaE2)
+
+fig, ax = plt.subplots()
+x = Df_PreguntaE2.Avion
+
+clase_economy = Df_PreguntaE2.TICKETS_ECONOMY
+clase_comfort = Df_PreguntaE2.TICKETS_COMFROT
+clase_business = Df_PreguntaE2.TICKETS_BUSINESS
+
+plt.bar(x, clase_economy, 0.4, label = "Economy", color = "#7BBFC9")
+plt.bar(x, clase_comfort, 0.4, label = "Comfort", color = "#BCE4D8")
+plt.bar(x, clase_business, 0.4, label = "Business", color = "#3A95B1")
+
+# Añadir etiquetas a las barras
+for i, v in enumerate(clase_economy):
+    plt.text(i, v, str(v), ha='center', va='bottom')
+# Añadir etiquetas a las barras
+for i, v in enumerate(clase_business):
+    plt.text(i, v, str(v), ha='center', va='bottom')
+
+plt.xlabel("Aviones")
+plt.ylabel("asientos vendidos")
 
 
-
-
-
-
+plt.legend()
+plt.show()
+st.pyplot(fig)
 
 
 

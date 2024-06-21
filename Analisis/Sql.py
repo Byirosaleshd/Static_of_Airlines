@@ -63,7 +63,7 @@ ORDER BY
 
 Pregunta_D1 = """
 SELECT
-    city,
+    city AS Ciudad,
     COUNT(flight_no) AS num_flights
 FROM
     (SELECT

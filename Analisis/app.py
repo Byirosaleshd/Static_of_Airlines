@@ -34,37 +34,33 @@ st.write("#### ¿Qué modelo de avión ha vendido en promedio una mayor cantidad
 #ft.imprimir_tabla('sillas',conn,'df_sillas','sillas')
 
 sillas = s.sillas
-df_sillas = ft.read_abilities(sillas,conn)
-st.write(df_sillas)
+df_sillas = ft.imprimir_df("df_sillas",sillas,conn)
 ft.Grafico_multibarras(df_sillas,'Economy','Business','Comfort',"Economy","Business","Comfort","Asientos Vendidos","Código de Avion","ASIENTOS VENDIDOS POR AVION")
 
 
 st.write("#### Dentro de los modelos de aviones con códigos: 773, 763 y SU9. ¿De cuánto ha sido la variabilidad de precios según el destino y la clase de vuelo?")
 PreguntaC = s.PreguntaC   
-Df_PreguntaC = ft.read_abilities(PreguntaC,conn)
-st.write(Df_PreguntaC)
+Df_PreguntaC = ft.imprimir_df("Df_PreguntaC",PreguntaC,conn)
 
 
 st.write("#### Si los aviones realizan vuelos entre los continentes de Asia y Europa: ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?")
 Pregunta_D1 = s.Pregunta_D1
 Df_Pregunta_D1 = ft.read_abilities(Pregunta_D1,conn)
-Df_Pregunta_D1
-st.bar_chart(Df_Pregunta_D1, x="city", y="num_flights")
+ft.limpiar_json(Df_Pregunta_D1,"Ciudad","Ciudad en ingles","Ciudad en ruso")
+Df_Pregunta_D1["Numero de vuelos"] = Df_Pregunta_D1["num_flights"] 
+Df_Pregunta_D1 = Df_Pregunta_D1.drop("num_flights", axis=1)
+Df_Pregunta_D1 = Df_Pregunta_D1[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
+Df_Pregunta_D1 =  Df_Pregunta_D1.sort_values(by="Numero de vuelos", ascending=False)
+st.write(Df_Pregunta_D1)
+st.bar_chart(Df_Pregunta_D1, x="Ciudad en ingles", y="Numero de vuelos")
 
 
 st.write("#### Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?")
 PreguntaD2 = s.PreguntaD2
 Df_PreguntaD2 = ft.read_abilities(PreguntaD2,conn)
-Df_PreguntaD2["asian_city"] = Df_PreguntaD2["asian_city"].apply(json.loads)
-Df_PreguntaD2[["city_en", "city_ru"]] = Df_PreguntaD2["asian_city"].apply(lambda x: pd.Series([x["en"], x["ru"]]))
-Df_PreguntaD2 = Df_PreguntaD2.drop("asian_city", axis=1)
-Df_PreguntaD2 = Df_PreguntaD2[["city_en","city_ru","num_flights"]]
+ft.limpiar_json(Df_PreguntaD2,"asian_city","Ciudad en ingles","Ciudad en ruso")
 Df_PreguntaD2["Numero de vuelos"] = Df_PreguntaD2["num_flights"] 
 Df_PreguntaD2 = Df_PreguntaD2.drop("num_flights", axis=1)
-Df_PreguntaD2["Ciudad en ingles"] = Df_PreguntaD2["city_en"]
-Df_PreguntaD2["Ciudad en ruso"] = Df_PreguntaD2["city_ru"]
-Df_PreguntaD2 = Df_PreguntaD2.drop("city_en", axis=1)
-Df_PreguntaD2 = Df_PreguntaD2.drop("city_ru", axis=1)
 Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
 Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
 st.write(Df_PreguntaD2)
@@ -78,33 +74,16 @@ st.bar_chart(Df_PreguntaD2, x="Ciudad en ingles", y="Numero de vuelos", color="#
 
 
 st.write("#### Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente: El promedio y la variabilidad de los vuelos realizados.")
-
-
-E1 = "SELECT aircraft_code AS 'Avión', count (status) AS 'Frecuencia_de_vuelos_realizados' FROM flights WHERE status IN ('Arrived') AND aircraft_code IN ('CR2','733','CN1') GROUP BY aircraft_code ORDER BY count (status) DESC;"
 Pregunta_E1 = s.E1
-Df_PreguntaE1 = ft.read_abilities(Pregunta_E1, conn)
-st.write(Df_PreguntaE1)
+Df_PreguntaE1 = ft.imprimir_df("Df_PreguntaE1",Pregunta_E1,conn)
 ft.grafico_pie(Df_PreguntaE1)
 
 
-#st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?")
-#Pregunta_E2 = s.Pregunta_E2
-#Df_PreguntaE2 = ft.read_abilities(Pregunta_E2,conn)
-#st.write(Df_PreguntaE2)
-#print(Df_PreguntaE2)
-
 
 st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?")
-
 Pregunta_E2 = s.E2
-Df_PreguntaE2 = ft.read_abilities(Pregunta_E2, conn)
-st.write(Df_PreguntaE2)
+Df_PreguntaE2 = ft.imprimir_df("Df_PreguntaE2",Pregunta_E2,conn)
 ft.grafico_barras_superpuestas(Df_PreguntaE2)
-
-
-
-
-
 
 
 

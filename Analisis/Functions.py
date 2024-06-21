@@ -142,3 +142,17 @@ def limpiar_json(df,name_total,name1,name2):
     Df_PreguntaD2 = Df_PreguntaD2.drop("city_ru", axis=1)
     Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
     Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
+
+
+
+def limpiar_json(df,columna_completa,columna_ingles,columna_ruso):
+    df[columna_completa] = df[columna_completa].apply(json.loads)
+    df[[columna_ingles, columna_ruso]] = df[columna_completa].apply(lambda x: pd.Series([x["en"], x["ru"]]))
+    df = df.drop(columna_completa, axis=1)
+    
+    
+def imprimir_df(df,Pregunta,conn):
+    df = ft.read_abilities(Pregunta,conn)
+    st.write(df)
+    return df
+    

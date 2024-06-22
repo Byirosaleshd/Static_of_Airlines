@@ -28,28 +28,27 @@ SELECT Tipo_de_ticket AS 'Tipo de ticket',
 	   Rango,
 	   Precio_Promedio AS 'Precio Promedio',
 	   Varianza,
-	   Desviacion_tipica,
-(Desviacion_tipica/Precio_Promedio) * 100 AS 'Coeficiente de variacion de Pearson',
-	Momento3/Varianza * Desviacion_tipica AS Simetria,
-	Desviacion4/Varianza * Varianza AS KURTOSIS
+	   Desviacion_tipica AS 'Desviacion Tipica',
+ROUND((Desviacion_tipica/Precio_Promedio) * 100,2) AS 'Coeficiente de variacion de Pearson'
+--	ROUND((Momento3/POW(Desviacion_tipica,3)),2)AS SIMETRIA,
+--	ROUND((Momento4/POW(Desviacion_tipica,4)),2) AS KURTOSIS
 	FROM 
 (SELECT fare_conditions AS Tipo_de_ticket, 
-	   COUNT(fare_conditions) AS Frecuencia, 
+	   COUNT(fare_conditions) AS Frecuencia,
 	   SUM(amount) AS Suma_del_precio,
 	   MAX(amount) AS Precio_Maximo, 
 	   MIN(AMOUNT) AS Precio_minimo,
 	   MAX(amount) - MIN(amount) AS Rango,
 	   ROUND(AVG(amount),2) AS Precio_Promedio,
-	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) AS Varianza,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion3,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion4,
-	   SQRT(
-	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) 
-		) AS Desviacion_tipica,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento3
+	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) AS Varianza,
+	   ROUND(SQRT(
+	    (POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights))
+		),2) AS Desviacion_tipica,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento3,
+	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),4) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento4
 FROM ticket_flights
 GROUP BY fare_conditions
-ORDER BY Frecuencia DESC)
+ORDER BY Frecuencia DESC);
 
 SELECT * FROM Pregunta_2
 

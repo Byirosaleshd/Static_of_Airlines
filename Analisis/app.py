@@ -7,9 +7,9 @@ import plotly.express as px #Graficos
 import plotly.graph_objs as go #Graficos
 import sqlite3 as sql #Database
 import numpy as np # Algebra lineal
-from sklearn.linear_model import LinearRegression #Regression
-from sklearn.model_selection import train_test_split #Regression
-from sklearn.metrics import r2_score #Regression
+#from sklearn.linear_model import LinearRegression #Regression
+#from sklearn.model_selection import train_test_split #Regression
+#from sklearn.metrics import r2_score #Regression
 import Functions as ft #Functions for this program
 import datetime as dt #Control for Time
 from pandas import json_normalize #Json utilities
@@ -20,8 +20,8 @@ from deep_translator import GoogleTranslator #Traducir
 
 
 # Conectar a la base de datos SQLite
-conn = sql.connect('Data/travel.sqlite')
-translator = GoogleTranslator(source="en", target="es")
+conn = sql.connect('../.data/travel.sqlite')
+#translator = GoogleTranslator(source="en", target="es")
 
 
 logo = Image.open(r'Images/avion.png')

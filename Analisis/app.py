@@ -56,27 +56,33 @@ if option == 'Presentacion':
 #    [Perfil Linkedln]()
 #    [CURRICULUM VITAE]()""")
     
+
+   
+    
 elif option == 'Pregunta A':
     st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?:")
-    st.markdown("Puedes seleccionar las estadisticas que desees")
-    # Creamos una lista con los nombres de las columnas del dataframe
+    st.markdown("Puedes seleccionar las estadisticas que desees:")
     Pregunta_A = s.Pregunta_A
     Df_PreguntaA = ft.read_abilities(Pregunta_A,conn)
-    ft.caracteristicas_modelo(Df_PreguntaA, 'scheduled_departure', 'scheduled_arrival','model')
-    st.line_chart(Df_PreguntaA, x="scheduled_departure", y="model")
+    ft.caracteristicas_modelo(Df_PreguntaA,'scheduled_arrival','scheduled_departure','model')
     columnas = list(Df_PreguntaA.columns)
     st.sidebar.write(" ")
     st.sidebar.write(" ")
-    columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["scheduled_departure","departure_airport","duracion_vuelo"])
+    columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["hora de llegada","hora de salida","departure_airport","arrival_airport","status","aircraft_code","Nombre en ingles","Nombre en ruso","duracion_vuelo"])
     data_filt = Df_PreguntaA[columnas_seleccionadas]
     st.dataframe(data_filt,width=550, height=400)
-
-
+    expandir = st.expander("Ver interpretacion")
+    expandir.write("goku")
+ #   expandir.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
+ #   expandir.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
+    
+    
+    
 elif option == 'Pregunta B':
     st.header("¿Qué modelo de avión ha vendido en promedio una mayor cantidad de puestos según la clase del vuelo?:")
     st.markdown("Puedes seleccionar las estadisticas que desees")
-    sillas = s.sillas
-    df_PreguntaB = ft.imprimir_df("df_PreguntaB",sillas,conn)
+    PreguntaB= s.PreguntaB
+    df_PreguntaB = ft.imprimir_df("df_PreguntaB",PreguntaB,conn)
     ft.Grafico_multibarras(df_PreguntaB,'Economy','Business','Comfort',"Economy","Business","Comfort","Asientos Vendidos","Código de Avion","ASIENTOS VENDIDOS POR AVION")
     columnas = list(df_PreguntaB.columns)
 

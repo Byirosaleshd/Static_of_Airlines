@@ -29,11 +29,11 @@ def read_abilities(query:str, conector) -> pd.DataFrame:
 #    return pd.read_sql_query(query, conn)
 
 
-def procesar_vuelos(Df, columna_salida, columna_llegada):
-    Df[columna_salida] = pd.to_datetime(Df[columna_salida])
+def procesar_vuelos(Df,columna_llegada,columna_salida):
     Df[columna_llegada] = pd.to_datetime(Df[columna_llegada])
-    Df['hora de salida'] = Df[columna_salida].apply(lambda x: x.hour + x.minute / 60)
-    Df['hora de llegada'] = Df[columna_llegada].apply(lambda x: x.hour + x.minute / 60)
+    Df[columna_salida] = pd.to_datetime(Df[columna_salida])
+    Df['hora de salida'] = Df[columna_llegada].apply(lambda x: x.hour + x.minute / 60)
+    Df['hora de llegada'] = Df[columna_salida].apply(lambda x: x.hour + x.minute / 60)
     Df['duracion_vuelo'] = Df['hora de salida'] - Df['hora de llegada']
     modelo_tiempo_promedio = Df.groupby('model')['duracion_vuelo'].mean()
     modelo_tiempo_promedio = modelo_tiempo_promedio.sort_values(ascending=True)
@@ -49,15 +49,15 @@ def modelo_frecuente(Df, columna_salida):
 
 
 
-def caracteristicas_modelo(Df, columna_salida, columna_llegada,nombres):
-    modelo_menor_tiempo = procesar_vuelos(Df, columna_salida, columna_llegada)
-    modelo_mas_frecuente = modelo_frecuente(Df, columna_salida)
+def caracteristicas_modelo(Df, columna_llegada,columna_salida, nombres):
+    modelo_menor_tiempo = procesar_vuelos(Df, columna_llegada,columna_salida)
+    modelo_mas_frecuente = modelo_frecuente(Df, columna_llegada)
     st.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
     st.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
-    Df[columna_salida] = pd.to_datetime(Df[columna_salida]).dt.time
     Df[columna_llegada] = pd.to_datetime(Df[columna_llegada]).dt.time
-    Df = Df[[columna_salida,'hora de salida',columna_llegada,'hora de llegada','departure_airport','arrival_airport','status','aircraft_code','Nombre en ingles','Nombre en ruso','duracion_vuelo']]
-    st.write(Df)
+    Df[columna_salida] = pd.to_datetime(Df[columna_salida]).dt.time
+    Df = Df[[columna_llegada,'hora de llegada',columna_salida,'hora de salida','departure_airport','arrival_airport','status','aircraft_code','Nombre en ingles','Nombre en ruso','duracion_vuelo']]
+    return Df
         
     
 def Grafico_multibarras(df,tipo1,tipo2,tipo3,label1:str,label2:str,label3:str,ylabel:str,xlabel:str,title:str):

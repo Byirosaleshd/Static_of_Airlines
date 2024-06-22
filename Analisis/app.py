@@ -20,7 +20,7 @@ from deep_translator import GoogleTranslator #Traducir
 
 
 # Conectar a la base de datos SQLite
-conn = sql.connect('../.data/travel.sqlite')
+conn = sql.connect('Data/travel.sqlite')
 #translator = GoogleTranslator(source="en", target="es")
 
 
@@ -60,10 +60,12 @@ if option == 'Presentacion':
    
     
 elif option == 'Pregunta A':
-    st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?:")
+    st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?")
     st.markdown("Puedes seleccionar las estadisticas que desees:")
     Pregunta_A = s.Pregunta_A
     Df_PreguntaA = ft.read_abilities(Pregunta_A,conn)
+    modelo_menor_tiempo = ft.modelos_menor(Df_PreguntaA,'scheduled_arrival','scheduled_departure')
+    modelo_mas_frecuente = ft.modelos_mas(Df_PreguntaA,'scheduled_arrival','scheduled_departure')
     ft.caracteristicas_modelo(Df_PreguntaA,'scheduled_arrival','scheduled_departure','model')
     columnas = list(Df_PreguntaA.columns)
     st.sidebar.write(" ")
@@ -73,8 +75,8 @@ elif option == 'Pregunta A':
     st.dataframe(data_filt,width=550, height=400)
     expandir = st.expander("Ver interpretacion")
     expandir.write("goku")
- #   expandir.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
- #   expandir.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
+    expandir.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
+    expandir.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
     
     
     

@@ -52,13 +52,20 @@ def modelo_frecuente(Df, columna_salida):
 def caracteristicas_modelo(Df, columna_llegada,columna_salida, nombres):
     modelo_menor_tiempo = procesar_vuelos(Df, columna_llegada,columna_salida)
     modelo_mas_frecuente = modelo_frecuente(Df, columna_llegada)
-    st.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
-    st.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
     Df[columna_llegada] = pd.to_datetime(Df[columna_llegada]).dt.time
     Df[columna_salida] = pd.to_datetime(Df[columna_salida]).dt.time
     Df = Df[[columna_llegada,'hora de llegada',columna_salida,'hora de salida','departure_airport','arrival_airport','status','aircraft_code','Nombre en ingles','Nombre en ruso','duracion_vuelo']]
-    return Df
+    return Df,modelo_menor_tiempo,modelo_mas_frecuente
         
+def modelos_menor(Df, columna_llegada,columna_salida):        
+    modelo_menor_tiempo = procesar_vuelos(Df, columna_llegada,columna_salida)
+    modelo_mas_frecuente = modelo_frecuente(Df, columna_llegada)
+    return modelo_menor_tiempo
+
+def modelos_mas(Df, columna_llegada,columna_salida):        
+    modelo_menor_tiempo = procesar_vuelos(Df, columna_llegada,columna_salida)
+    modelo_mas_frecuente = modelo_frecuente(Df, columna_llegada)
+    return modelo_mas_frecuente
     
 def Grafico_multibarras(df,tipo1,tipo2,tipo3,label1:str,label2:str,label3:str,ylabel:str,xlabel:str,title:str):
     labels = df.CodigodeAvion

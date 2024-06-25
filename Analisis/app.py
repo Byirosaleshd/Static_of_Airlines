@@ -21,7 +21,7 @@ from deep_translator import GoogleTranslator #Traducir
 
 # Conectar a la base de datos SQLite
 conn = sql.connect('Data/travel.sqlite')
-#translator = GoogleTranslator(source="en", target="es")
+translator = GoogleTranslator(source="en", target="es")
 
 
 logo = Image.open(r'Images/avion.png')
@@ -31,7 +31,7 @@ st.sidebar.write(" ")
 st.sidebar.write(" ")
 option = st.sidebar.selectbox(
     'Selecciona una pagina para navegar por la app',
-    ('Presentacion','Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D","Pregunta E","Modelo de regresion"))
+    ('Presentacion','Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D","Modelo de regresion"))
 if option == 'Presentacion':
     st.write(" ")
     st.write(" ")
@@ -56,8 +56,8 @@ if option == 'Presentacion':
 #    [Perfil Linkedln]()
 #    [CURRICULUM VITAE]()""")
     
+    
 
-   
     
 elif option == 'Pregunta A':
     st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?")
@@ -74,10 +74,46 @@ elif option == 'Pregunta A':
     data_filt = Df_PreguntaA[columnas_seleccionadas]
     st.dataframe(data_filt,width=550, height=400)
     expandir = st.expander("Ver interpretacion")
-    expandir.write("goku")
     expandir.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
     expandir.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
     
+    Respuesta_grafico_pregunta_a = s.Pregunta_A
+    Df_Respuesta_grafico_pregunta_a = ft.read_abilities(Respuesta_grafico_pregunta_a,conn)
+    Df_Respuesta_grafico_pregunta_a = Df_Respuesta_grafico_pregunta_a[["scheduled_departure","scheduled_arrival","departure_airport","arrival_airport","status","aircraft_code","Nombre en ingles"]]
+    Df_Respuesta_grafico_pregunta_a["Fecha de llegada"] = pd.to_datetime(Df_Respuesta_grafico_pregunta_a["scheduled_arrival"])
+    Df_Respuesta_grafico_pregunta_a['Mes'] = Df_Respuesta_grafico_pregunta_a['Fecha de llegada'].dt.month
+    Df_Respuesta_grafico_pregunta_a = Df_Respuesta_grafico_pregunta_a[["Nombre en ingles","Mes"]]
+    Df_Respuesta_grafico_pregunta_a['Nombre'] = Df_Respuesta_grafico_pregunta_a["Nombre en ingles"]
+    Df_Respuesta_grafico_pregunta_a.drop("Nombre en ingles", axis=1)
+    Df_Respuesta_grafico_pregunta_a.to_sql('PreguntaA', conn, if_exists='replace', index=False)
+    
+    A = s.Pa
+    df_a = ft.read_abilities(A,conn)
+    st.write(df_a)
+    st.line_chart(data=df_a, x='Mes', y='cantidad')
+
+
+  
+    for avion in df_a:
+        plt.plot(df_a['Mes'], df_a['Nombre'], label=avion)
+
+    plt.xlabel('Mes')
+    plt.ylabel('Cantidad')
+    plt.title('Gráfico de Series de Tiempo por Avión')
+    plt.legend()
+
+    # Muestra el gráfico en Streamlit
+    st.pyplot(plt)
+
+
+
+
+
+
+
+
+# Muestra el resultado
+
     
     
 elif option == 'Pregunta B':
@@ -90,14 +126,6 @@ elif option == 'Pregunta B':
 
 
 elif option == 'Pregunta C':
-    st.header("Dentro de los modelos de aviones con códigos: 773, 763 y SU9. ¿De cuánto ha sido la variabilidad de precios según el destino y la clase de vuelo:")
-    st.markdown("Puedes seleccionar las estadisticas que desees")
-    PreguntaC = s.PreguntaC   
-    Df_PreguntaC = ft.imprimir_df("Df_PreguntaC",PreguntaC,conn)
-    columnas = list(Df_PreguntaC.columns)
-
-
-elif option == 'Pregunta D':
     st.header("Si los aviones realizan vuelos entre los continentes de Asia y Europa: ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?:")
     st.markdown("Puedes seleccionar las estadisticas que desees")
     Pregunta_D1 = s.Pregunta_D1
@@ -120,12 +148,16 @@ elif option == 'Pregunta D':
     Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
     Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
     Df_PreguntaD2["Ciudad"] = Df_PreguntaD2["Ciudad en ingles"].apply(translator.translate)
-    st.write(Df_PreguntaD2)
-    st.bar_chart(Df_PreguntaD2, x="Ciudad en ingles", y="Numero de vuelos", color="#FF0000")
-    columnas = list(Df_PreguntaD2.columns)
+    Df_PreguntaD2_sorted = Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
+    Df_PreguntaD2_sorteda = Df_PreguntaD2_sorted[["Ciudad","Numero de vuelos"]]
+    Df_PreguntaD2_sorteda = Df_PreguntaD2_sorteda[["Ciudad","Numero de vuelos"]]
+    Df_PreguntaD2_sorteda = Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
+    st.write(Df_PreguntaD2_sorteda)
+    st.bar_chart(Df_PreguntaD2_sorteda, x="Ciudad", y="Numero de vuelos", color="#FF0000")
+    columnas = list(Df_PreguntaD2_sorteda.columns)
 
 
-elif option == 'Pregunta E':
+elif option == 'Pregunta D':
     st.header("Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente: El promedio y la variabilidad de los vuelos realizados:")
     st.markdown("Puedes seleccionar las estadisticas que desees")
     Pregunta_E1 = s.E1
@@ -134,9 +166,8 @@ elif option == 'Pregunta E':
     columnas = list(Df_PreguntaE1.columns)
 
     st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Business?")
-    Pregunta_E2 = s.E2
-    Df_PreguntaE2 = ft.imprimir_df("Df_PreguntaE2",Pregunta_E2,conn)
-    ft.grafico_barras_superpuestas(Df_PreguntaE2)
+    ft.pregunta_E2("Df_PreguntaE2","Pregunta_E2",conn)
+    Df_PreguntaE2 = ft.pregunta_E2("Df_PreguntaE2","Pregunta_E2",conn)
     columnas = list(Df_PreguntaE2.columns)
 
 

@@ -163,3 +163,7 @@ def imprimir_df(df,Pregunta,conn):
     st.write(df)
     return df
     
+def pregunta_E2(Df,name_pregunta,conn):
+    name_pregunta = s.E2
+    Df = ft.imprimir_df(Df,name_pregunta,conn)
+    ft.grafico_barras_superpuestas(Df)

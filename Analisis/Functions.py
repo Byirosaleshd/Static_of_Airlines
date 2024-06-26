@@ -1,15 +1,24 @@
-import streamlit as st
-import datetime as dt
-import pandas  as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import sqlite3 as sql
-import numpy as np
-import Functions as ft
-import datetime as dt
-from pandas import json_normalize
-import json
-import Sql as s
+#Llamamos las librerias
+import streamlit as st #App
+import pandas as pd #Statics
+import matplotlib.pyplot as plt #Graficos
+import seaborn as sns #Graficos
+import plotly.express as px #Graficos
+import plotly.graph_objs as go #Graficos
+import sqlite3 as sql #Database
+import numpy as np # Algebra lineal
+from sklearn.linear_model import LinearRegression #Regression
+from sklearn.model_selection import train_test_split #Regression
+from sklearn.metrics import r2_score #Regression
+import Functions as ft #Functions for this program
+import datetime as dt #Control for Time
+from pandas import json_normalize #Json utilities
+import json #Json utilites
+import Sql as s #Sql querys
+from PIL import Image #Images
+from deep_translator import GoogleTranslator #Traducir
+
+
 
     
 #def load_sql(type:str) -> pd.DataFrame:
@@ -110,6 +119,24 @@ def grafico_pie(df):
     plt.show()
     return st.pyplot(fig)
     
+
+    
+    
+def grafico_pie_streamlit(df):
+        colors = ['#3A95B1', '#7BBFC9', '#BCE4D8']
+        fig = go.Figure(data=[go.Pie(labels=["CN1","CR2","733"],
+        values=df["Frecuencia_de_vuelos_realizados"].values,
+        hole=.4,
+        marker=dict(colors=colors),
+        textinfo='label+percent')])
+        fig.update_layout(title={
+            'text': "Porcentaje de vuelos realizados por cada avion",
+            'y':0.95,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'},
+        title_font=dict(size=20))
+        return st.plotly_chart(fig)    
     
 
 def grafico_barras_superpuestas(df):
@@ -162,8 +189,16 @@ def imprimir_df(df,Pregunta,conn):
     df = ft.read_abilities(Pregunta,conn)
     st.write(df)
     return df
+
+def pasar_dataframe(df,Pregunta,conn):
+    df = ft.read_abilities(Pregunta,conn)
+    return df
+
     
 def pregunta_E2(Df,name_pregunta,conn):
     name_pregunta = s.E2
     Df = ft.imprimir_df(Df,name_pregunta,conn)
     ft.grafico_barras_superpuestas(Df)
+    
+    
+

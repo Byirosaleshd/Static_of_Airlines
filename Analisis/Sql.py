@@ -1,29 +1,10 @@
-Pregunta_A = """SELECT flights.flight_id,
-flights.flight_no,
-flights.scheduled_departure,
-flights.scheduled_arrival,
-flights.departure_airport,
-flights.arrival_airport,
-flights.status,
-flights.aircraft_code,
-aircrafts_data.model,
-json_extract(aircrafts_data.model, '$.en') AS 'Nombre en ingles',
-json_extract(aircrafts_data.model, '$.ru') AS 'Nombre en ruso'
-FROM flights
-INNER JOIN aircrafts_data 
-ON aircrafts_data.aircraft_code = flights.aircraft_code
-WHERE
-    flights.status IN ('Arrived', 'On Time');"""
+Pregunta_A = """SELECT flights.flight_id, flights.flight_no, flights.scheduled_departure, flights.scheduled_arrival, flights.departure_airport, flights.arrival_airport, flights.status, flights.aircraft_code, aircrafts_data.model, json_extract(aircrafts_data.model, '$.en') AS 'Nombre en ingles', json_extract(aircrafts_data.model, '$.ru') AS 'Nombre en ruso' FROM flights INNER JOIN aircrafts_data ON aircrafts_data.aircraft_code = flights.aircraft_code WHERE flights.status IN ('Arrived', 'On Time');"""
 
 PreguntaA1 = "SELECT aircraft_code AS 'CÓDIGO DE AVIÓN', COUNT(CASE WHEN scheduled_arrival LIKE '%2017-07%' THEN 1 END) AS 'VUELOS EN 2017-07', COUNT(CASE WHEN scheduled_arrival LIKE '%2017-08%' THEN 1 END) AS 'VUELOS EN 2017-08', COUNT(aircraft_code) AS 'VUELOS VENDIDOS' FROM flights WHERE scheduled_arrival LIKE '%2017-07%' OR scheduled_arrival LIKE '%2017-08%' AND status IN ('Arrived') GROUP BY aircraft_code ORDER BY COUNT(aircraft_code) DESC;"
 
 PreguntaA2 = "SELECT aircraft_code AS 'CODIGO DE AVION', range AS 'ALCANCE DEL AVION' FROM aircrafts_data ORDER BY range DESC;"
 
-PreguntaB = "SELECT a.aircraft_code AS 'CodigodeAvion', SUM(CASE WHEN s.fare_conditions = 'Economy' THEN 1 ELSE 0 END) AS 'Economy', SUM(CASE WHEN s.fare_conditions = 'Business' THEN 1 ELSE 0 END) AS 'Business', SUM(CASE WHEN s.fare_conditions = 'Comfort' THEN 1 ELSE 0 END) AS 'Comfort' FROM aircrafts_data a LEFT JOIN seats s ON a.aircraft_code = s.aircraft_code GROUP BY a.aircraft_code ORDER BY SUM(CASE WHEN s.fare_conditions = 'Economy' THEN 1 ELSE 0 END) DESC;"
-
-Pregunta_C1 = "SELECT aircraft_code AS Avion, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Europe_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Europe_to_Asia, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Asia_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Asia_to_Asia FROM flights WHERE status = 'Arrived' GROUP BY aircraft_code ORDER BY Europe_to_Europe DESC;"
-
-Pregunta_C2 = "SELECT COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Europe_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Europe_to_Asia, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Asia_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Asia_to_Asia, COUNT(arrival_airport) AS 'Total de vuelos' FROM flights WHERE status = 'Arrived' ORDER BY Europe_to_Europe DESC;"
+PreguntaB = "SELECT flights.aircraft_code AS 'CodigodeAvion', SUM(CASE WHEN ticket_flights.fare_conditions = 'Economy' THEN 1 ELSE 0 END) AS 'Economy', SUM(CASE WHEN ticket_flights.fare_conditions = 'Business' THEN 1 ELSE 0 END) AS 'Business', SUM(CASE WHEN ticket_flights.fare_conditions = 'Comfort' THEN 1 ELSE 0 END) AS 'Comfort', COUNT(ticket_flights.fare_conditions) AS 'Asientos vendidos' FROM flights INNER JOIN ticket_flights ON flights.flight_id = ticket_flights.flight_id WHERE flights.status = 'Arrived' GROUP BY flights.aircraft_code ORDER BY SUM(CASE WHEN ticket_flights.fare_conditions = 'Economy' THEN 1 ELSE 0 END) DESC;"
 
 PreguntaC = """
 SELECT
@@ -67,9 +48,10 @@ GROUP BY
 ORDER BY
     arrival_airport, fare_conditions;
 """
-    
-    
 
+Pregunta_C1 = "SELECT aircraft_code AS Avion, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Europe_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Europe_to_Asia, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Asia_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Asia_to_Asia FROM flights WHERE status = 'Arrived' GROUP BY aircraft_code ORDER BY Europe_to_Europe DESC;"
+
+Pregunta_C2 = "SELECT COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Europe_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Europe_to_Asia, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Europe%') THEN 1 END) AS Asia_to_Europe, COUNT(CASE WHEN departure_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') AND arrival_airport IN (SELECT airport_code FROM airports_data WHERE timezone LIKE '%Asia%') THEN 1 END) AS Asia_to_Asia, COUNT(arrival_airport) AS 'Total de vuelos' FROM flights WHERE status = 'Arrived' ORDER BY Europe_to_Europe DESC;"
 
 Pregunta_D1 = """
 SELECT

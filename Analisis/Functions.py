@@ -139,6 +139,22 @@ def grafico_pie_streamlit(df):
         return st.plotly_chart(fig)    
     
 
+def grafico_pie_nueva(df):
+        colors = ['#3A95B1', '#7BBFC9', '#BCE4D8']
+        fig = go.Figure(data=[go.Pie(labels=["SU9","CR2","CN1"],
+        values=df["Frecuencia_de_vuelos_realizados"].values,
+        hole=.4,
+        marker=dict(colors=colors),
+        textinfo='label+percent')])
+        fig.update_layout(title={
+            'text': "Porcentaje de vuelos realizados por cada avion",
+            'y':0.95,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'},
+        title_font=dict(size=20))
+        return st.plotly_chart(fig)  
+
 def grafico_barras_superpuestas(df):
     fig, ax = plt.subplots()
     x = df.Avion

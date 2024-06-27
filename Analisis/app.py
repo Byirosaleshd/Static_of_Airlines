@@ -32,7 +32,7 @@ st.sidebar.write(" ")
 st.sidebar.write(" ")
 option = st.sidebar.selectbox(
     'Selecciona una pagina para navegar por la app',
-    ('Presentacion', 'Planteamiento', 'Pregunta A',  'Pregunta A2', 'Pregunta B',"Pregunta C","Pregunta D","Pregunta E","Modelo de regresion"))
+    ('Presentacion', 'Planteamiento', 'Campos de la BBDD', 'Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D", "Pregunta E","Modelo de regresion"))
 if option == 'Presentacion':
     st.write(" ")
     st.write(" ")
@@ -70,8 +70,68 @@ elif option == 'Planteamiento':
     st.markdown("   - ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Económica?")
 
 
+elif option == 'Campos de la BBDD':
+    st.title("Entidades y campos")
+    st.header("   - Entidad aircrafts_data")
+    st.markdown(""" 
+    1. **aircraft_code**: que alude al código de nueve aviones.
+    2. **Model**: indica el tipo de modelo correspondiente a los nueve aviones. 
+    3. **Range**: siendo el alcance la distancia que es capaz de recorrer volando a velocidad de crucero en línea recta.
+    """)
+    st.header("   - Entidad airports_data")
+    st.markdown("""
+    1. **airport_code**: que incluye el código del aeropuerto.
+    2. **airport_name**: describe el nombre del aeropuerto.
+    3. **city**: menciona la ciudad de cada aeropuerto.
+    4. **coordinates**: señala las coordenadas de ubicación de cada aeropuerto.
+    5. **timezone**: que es la zona horaria de cada ciudad con el continente al cual pertenece.""")
+    st.header("   - Entidad boarding_passes:")
+    st.markdown(""" 
+    1. **ticket_no**: el cual describe el número de ticket.
+    2. **flight_ID**: señala el código del vuelo.
+    3. **boarding_no**: alude al número de reserva.
+    4. **seat_no**: representa el número de asiento asignado por la aerolínea.""")
+    st.header("   - Entidad bookings: ")
+    st.markdown("""
+    1. **book_ref**: señala la información correspondiente al vuelo.
+    2. **book_date**: describe la fecha en la que fue emitido el libro. 
+    3. **total_amount**: expresa el peso total que puede soportar un avión.""")
+    st.header("   - Entidad flights:")        
+    st.markdown("""
+    1. **flight_id**: indica el código del vuelo.
+    2. **flight_no**: expresa el código de vuelo emitido por la agencia de viajes o la misma aerolínea. 
+    3. **schedule_ departure**: señala el despegue de los aviones hacia algún destino.
+    4. **schedule_arrival**: indica la llegada de los aviones hacia algún destino.
+    5. **departure_airport**: describe el código de aeropuerto de salida de un avión.
+    6.**arrival_airport**: expresa el código del aeropuerto de llegada de un avión. 
+    7. **Status**: relata información actualizada del vuelo que está realizándose o este próxima a realizarse.
+    8. **aircraft_code**: que alude al código de nueve aviones.
+    9. **actual_departure**: es un radar que expresa la salida y condiciones del vuelo en tiempo real.
+    10. **actual_arrival**: es un radar en tiempo real que expresa la llegada y condiciones del vuelo en tiempo real.""")
+    st.header("   - Entidad seats:")
+    st.markdown("""
+    1. **aircraft_code**: que alude al código de nueve aviones.
+    2. **seat_no**: alude al número de asiento asignado por vuelo para cada pasajero.
+    3. **fare_conditions**: expresa los tipos de vuelos a tomarse según cada aerolínea""")
+    st.header("   - Entidad ticket_flights:")
+    st.markdown(""" 
+    1. **ticket_no**: el cual describe el número de ticket. 
+    2. **flight_id**: indica el código del vuelo.
+    3. **fare_conditions**: expresa los tipos de vuelos a tomarse según cada aerolínea. 
+    4. **amount**: expresa el costo de cada vuelo según el tipo de boleto.""")
+    st.header("   - Entidad tickets:")
+    st.markdown(""" 
+    1. **ticket_no**: el cual describe el número de ticket.
+    2. **book_ref**: señala la información correspondiente al vuelo. 
+    3. **passenger_id**: indica el código de cada usuario que ha comprado un ticket para un vuelo de avión.""")
+
+      
+    
 elif option == 'Pregunta A':
-    st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?")
+
+    st.title("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?")
+
+    st.header("Duración de vuelos")
     st.markdown("Puedes seleccionar las columnas que deseas:")
     Pregunta_A = s.Pregunta_A
     Df_PreguntaA = ft.read_abilities(Pregunta_A,conn)
@@ -84,15 +144,9 @@ elif option == 'Pregunta A':
     columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["hora de llegada","hora de salida","departure_airport","arrival_airport","status","aircraft_code","Nombre en ingles","Nombre en ruso","duracion_vuelo"])
     data_filt = Df_PreguntaA[columnas_seleccionadas]
     st.dataframe(data_filt,width=550, height=400)
-    expandir = st.expander("Ver interpretacion")
-    expandir.write(f"El modelo de avión que realiza vuelos en el menor tiempo promedio es: {modelo_menor_tiempo}")
-    expandir.write(f"El modelo de avión que realiza la mayor cantidad de vuelos es: {modelo_mas_frecuente}")
-    
-    
-    
-    
-elif option == 'Pregunta A2':
-    st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?")
+
+    st.header("Vuelos realizados en Julio y Agosto")
+
     PreguntaA1= s.PreguntaA1
     df_PreguntaA1 = ft.imprimir_df("df_PreguntaA1",PreguntaA1,conn)
     aviones = df_PreguntaA1['CÓDIGO DE AVIÓN']
@@ -111,6 +165,8 @@ elif option == 'Pregunta A2':
     expandir.write(f"Al analizar la distribución de las barras, podemos ver que el avión CN1 es el que más vuelos vendió en ambos meses, mientras que el avión 773 vendió menos vuelos en comparación. Y al ser un gráfico de barras apiladas tenemos que la barra de Julio es más larga que la barra de agosto, lo que indica que se vendieron más vuelos en Julio que en agosto; esto puede ser debido a que julio es un mes de alta demanda para viajes debido a las vacaciones de verano en algunos países, lo que podría explicar el aumento en la cantidad de vuelos vendidos.")
 
     
+    st.header("Alcance de Aviones")
+
     PreguntaA2= s.PreguntaA2
     df_PreguntaA2 = ft.imprimir_df("df_PreguntaB",PreguntaA2,conn)
     # Datos
@@ -130,8 +186,9 @@ elif option == 'Pregunta A2':
 
 
 elif option == 'Pregunta B':
-    st.header("¿Qué modelo de avión ha vendido en promedio una mayor cantidad de puestos según la clase del vuelo?:")
-    st.markdown("Puedes seleccionar las estadisticas que desees")
+    st.title("¿Qué modelo de avión ha vendido en promedio una mayor cantidad de puestos según la clase del vuelo?:")
+    st.header("Total de asientos vendidos por los aviones")
+    st.markdown("Puedes seleccionar las columnas que desees:")
     Pregunta_B= s.Pregunta_B
     df_Pregunta_B = ft.imprimir_df("df_PreguntaB",Pregunta_B,conn)
     labels = df_Pregunta_B.CodigodeAvion
@@ -162,22 +219,22 @@ elif option == 'Pregunta B':
     plt.show()
     st.pyplot(fig)
     columnas = list(df_Pregunta_B.columns)
-    st.markdown("Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “773”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en las otras dos clases. Siendo así, la aeronave con mayores asientos vendidos.")
-
+    expandir = st.expander("Ver interpretacion")
+    expandir.write(f"Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave, esto debido a que es la clase con mayor accesibilidad financiera para los pasajeros. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “SU9”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en la clase Business, mientras que el único avión en vender asientos en clase comfort fue la aeronave cuyo código es 773.")
 
 
 
 
 elif option == 'Pregunta C':
-    st.header("¿Cuál es la ruta con mayor frecuencia realizada por los aviones, que avión realiza mayor cantidad de vuelos para las rutas Europa-Europa, Europa-Asia, Asia-Asia y Asia-Europa?")
+    st.title("¿Cuál es la ruta con mayor frecuencia realizada por los aviones, que avión realiza mayor cantidad de vuelos para las rutas Europa-Europa, Europa-Asia, Asia-Asia y Asia-Europa?")
     Pregunta_C1 = s.Pregunta_C1   
     Df_Pregunta_C1 = ft.imprimir_df("Df_PreguntaC",Pregunta_C1,conn)
     columnas = list(Df_Pregunta_C1.columns)
     labels = Df_Pregunta_C1['Avion']
-    Europa_Europa = Df_Pregunta_C1['Europe_to_Europe']
-    Europa_Asia = Df_Pregunta_C1['Europe_to_Asia']
-    Asia_Asia = Df_Pregunta_C1['Asia_to_Asia']
-    Asia_Europa = Df_Pregunta_C1['Asia_to_Europe']
+    Europa_Europa = Df_Pregunta_C1['Europa-Europa']
+    Europa_Asia = Df_Pregunta_C1['Europa-Asia']
+    Asia_Asia = Df_Pregunta_C1['Asia-Asia']
+    Asia_Europa = Df_Pregunta_C1['Asia-Europa']
     # Crear figura y ejes
     fig, ax = plt.subplots()
     # Crear barras acumuladas
@@ -194,10 +251,11 @@ elif option == 'Pregunta C':
     # Mostrar gráfico
     plt.show()
     st.pyplot(fig)
-    st.markdown("En la gráfica contamos con 8 aviones, y sus respectivos vuelos categorizados por la ruta que hayan tomado. Podemos apreciar que la ruta con mayores aviones circulando es la de Europa-Europa. Tenemos que 5 de 8 aviones realizan vuelos en las 4 rutas posibles, pero el avión cuyo código es “SU9” realiza mayor cantidad de vuelos para la ruta Europa-Europa con 2212 vuelos. El avión cuyo código es “CR2” realiza mayor cantidad de vuelos para las rutas: Europa-Asia con 685 vuelos y Asia-Europa con 683 vuelos. Y por último el avión cuyo código es “CN1” realiza una mayor cantidad de vuelos para la ruta Asia-Asia con 1976 vuelos.")
+    expandir = st.expander("Ver interpretacion")
+    expandir.write(f"En la gráfica contamos con 8 aviones, y sus respectivos vuelos categorizados por la ruta que hayan tomado. Podemos apreciar que la ruta con mayores aviones circulando es la de Europa-Europa. Tenemos que 5 de 8 aviones realizan vuelos en las 4 rutas posibles, pero el avión cuyo código es “SU9” realiza mayor cantidad de vuelos para la ruta Europa-Europa con 2212 vuelos. El avión cuyo código es “CR2” realiza mayor cantidad de vuelos para las rutas: Europa-Asia con 685 vuelos y Asia-Europa con 683 vuelos. Y por último el avión cuyo código es “CN1” realiza una mayor cantidad de vuelos para la ruta Asia-Asia con 1976 vuelos.")
 
 
-    st.header("¿Cuál es la ruta con mayores vuelos, sin importar el avión?")
+    st.title("¿Cuál es la ruta con mayores vuelos, sin importar el avión?")
     Pregunta_C2 = s.Pregunta_C2   
     Df_Pregunta_C2 = ft.imprimir_df("Df_PreguntaC",Pregunta_C2,conn)
     columnas = list(Df_Pregunta_C2.columns)
@@ -212,13 +270,14 @@ elif option == 'Pregunta C':
         pctdistance=0.6, radius=0.7, labeldistance=1.15)
     plt.show()
     st.pyplot(fig)
-    st.markdown("En la base de datos se cuenta con un total de 16.707 vuelos que llegaron a su destino, en este gráfico de torta podemos apreciar que la ruta con mayor cantidad de vuelos es Europa-Europa con un 48%, duplicando la cantidad de vuelos que cuenta la segunda ruta más frecuentada por los aviones que es Asia-Asia, mientras que las rutas con destinos internacionales tienen el mismo porcentaje.")
+    expandir = st.expander("Ver interpretacion")
+    expandir.write(f"En la base de datos se cuenta con un total de 16.707 vuelos que llegaron a su destino, en este gráfico de torta podemos apreciar que la ruta con mayor cantidad de vuelos es Europa-Europa con un 48%, duplicando la cantidad de vuelos que cuenta la segunda ruta más frecuentada por los aviones que es Asia-Asia, mientras que las rutas con destinos internacionales tienen el mismo porcentaje.")
 
 
 
 elif option == 'Pregunta D':
-    st.header("Si los aviones realizan vuelos entre los continentes de Asia y Europa: ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?:")
-    st.markdown("Puedes seleccionar las columnas que desees")
+    st.title("Si los aviones realizan vuelos entre los continentes de Asia y Europa: ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?:")
+    st.markdown("Puedes seleccionar las columnas que desees:")
     Pregunta_D1 = s.Pregunta_D1
     Df_Pregunta_D1 = ft.read_abilities(Pregunta_D1,conn)
     ft.limpiar_json(Df_Pregunta_D1,"Ciudad","Ciudad en ingles","Ciudad en ruso")
@@ -234,45 +293,10 @@ elif option == 'Pregunta D':
     st.dataframe(data_filt,width=550, height=400)
     st.bar_chart(Df_Pregunta_D1, x="Ciudad en ingles", y="Numero de vuelos")
     expandir = st.expander("Ver interpretacion")
-    st.markdown("Al analizar la gráfica podemos apreciar que la ciudad que recibe una mayor cantidad de vuelos del avión cuyo código es “763” es la ciudad de Moscow con una cantidad altamente representativa frente a las demás ciudades, cuenta con un total de 453 vuelos recibidos por dicho avión ,esto puede ser debido a que es una ciudad que cuenta con mayor turismo en el continente asiático; mientras que como segundas ciudades con mayor cantidad de vuelos, encontramos a las cuidades de Krasnodar y Khabarovsk con un total de 122 vuelos recibidos.")
-    expandir.write(f"Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “773”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en las otras dos clases. Siendo así, la aeronave con mayores asientos vendidos.")
-     
+    expandir.write(f"Al analizar la gráfica podemos apreciar que la ciudad que recibe una mayor cantidad de vuelos del avión cuyo código es “763” es la ciudad de Moscow con una cantidad altamente representativa frente a las demás ciudades, cuenta con un total de 453 vuelos recibidos por dicho avión ,esto puede ser debido a que es una ciudad que cuenta con mayor turismo en el continente asiático; mientras que como segundas ciudades con mayor cantidad de vuelos, encontramos a las cuidades de Krasnodar y Khabarovsk con un total de 122 vuelos recibidos.")
+  
     
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    st.write("#### Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?")
-    PreguntaD2 = s.PreguntaD2
-    Df_PreguntaD2 = ft.read_abilities(PreguntaD2,conn)
-    ft.limpiar_json(Df_PreguntaD2,"asian_city","Ciudad en ingles","Ciudad en ruso")
-    Df_PreguntaD2["Numero de vuelos"] = Df_PreguntaD2["num_flights"] 
-    Df_PreguntaD2 = Df_PreguntaD2.drop("num_flights", axis=1)
-    Df_PreguntaD2 = Df_PreguntaD2[["Ciudad en ingles","Ciudad en ruso","Numero de vuelos"]]
-    Df_PreguntaD2 =  Df_PreguntaD2.sort_values(by="Numero de vuelos", ascending=False)
-    Df_PreguntaD2["Ciudad"] = Df_PreguntaD2["Ciudad en ingles"].apply(translator.translate)
-    st.write(Df_PreguntaD2)
-    st.bar_chart(Df_PreguntaD2, x="Ciudad en ingles", y="Numero de vuelos", color="#FF0000")
-    columnas = list(Df_PreguntaD2.columns)
-    st.markdown("La ciudad que recibe una mayor cantidad de vuelo de parte de las aerolíneas europeas es Perm, ciudad de Rusia que está situada a orillas del río Kama en la parte europea de Rusia, y cuenta con un total de 366 vuelos recibidos.")
-
-
-
-    
-
-
-    
-    st.write("#### Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?")
+    st.title("Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?")
     PreguntaD2 = s.PreguntaD2
     Df_PreguntaD2 = ft.read_abilities(PreguntaD2,conn)
     ft.limpiar_json(Df_PreguntaD2,"asian_city","Ciudad en ingles","Ciudad en ruso")
@@ -288,67 +312,43 @@ elif option == 'Pregunta D':
     st.write(Df_PreguntaD2_sorteda)
     st.bar_chart(Df_PreguntaD2_sorteda, x="Ciudad", y="Numero de vuelos", color="#FF0000")
     columnas = list(Df_PreguntaD2_sorteda.columns)
-
-
+    expandir = st.expander("Ver interpretacion")
+    expandir.write(f"La ciudad que recibe una mayor cantidad de vuelo de parte de las aerolíneas europeas es Perm, ciudad de Rusia que está situada a orillas del río Kama en la parte europea de Rusia, y cuenta con un total de 366 vuelos recibidos.")
 
 
 elif option == 'Pregunta E':
-    st.header("Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente: El promedio y la variabilidad de los vuelos realizados:")
-    st.markdown("Puedes seleccionar las estadisticas que desees")
-    Pregunta_E1 = s.E1
-    Df_PreguntaE1 = ft.imprimir_df("Df_PreguntaE1",Pregunta_E1,conn)
-    #ft.grafico_pie(Df_PreguntaE1)
-    columnas = list(Df_PreguntaE1.columns)
+
+    st.title("Entre los modelos de aviones con los códigos: CR2, SU9 y CN1 se desea conocer lo siguiente: vuelos realizados al aeropuerto DME")
+    Pregunta_e2_1= s.E2_1
+    df_Pregunta_E1 = ft.imprimir_df("df_PreguntaB",Pregunta_e2_1,conn)
+    #columnas = list(df_Pregunta_E1.columns)
     st.sidebar.write(" ")
     st.sidebar.write(" ")
-    columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["Avión","Frecuencia_de_vuelos_realizados"])
-    data_filt = Df_PreguntaE1[columnas_seleccionadas]
-    st.dataframe(data_filt,width=550, height=400)
-    ft.grafico_pie_streamlit(Df_PreguntaE1)
-    expandir = st.expander("Ver interpretacion")
-    expandir.write("Entre estos tres modelos de aviones tenemos que el 47% de vuelos realizados y que llegaron a su destino pertenece al avión cuyo código es “CN1” con un total de 4674 vuelos, mientras que el CR2 cuenta con casi 100 vuelos menos que el CN1.")
+    #columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["Avión","Frecuencia_de_vuelos_realizados"])
+    #data_filt = df_Pregunta_E1[columnas_seleccionadas]
+    #st.dataframe(data_filt,width=550, height=400)
+    ft.grafico_pie_nueva(df_Pregunta_E1)
 
-
-
-
-
-
-
-
-
-    st.write("#### ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Económica?")
-    Pregunta_E2 = s.E2
-    Df_PreguntaE2 = ft.imprimir_df("Df_PreguntaE2",Pregunta_E2,conn)
-    columnas = list(Df_PreguntaE2.columns)
-    st.sidebar.write(" ")
-    st.sidebar.write(" ")
-    columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["Avion","Condiciones_de_vuelo","TICKETS_ECONOMY","TICKETS_COMFROT","TICKETS_BUSINESS","TOTAL_TICKETS"])
-    data_filt = Df_PreguntaE2[columnas_seleccionadas]
-    st.dataframe(data_filt,width=550, height=400)
+    st.title("Entre los modelos de aviones con los códigos: CR2, SU9 y CN1 se desea conocer lo siguiente: vuelos realizados al aeropuerto DME")
+    Pregunta_e2_2= s.E2_2
+    df_Pregunta_E2 = ft.imprimir_df("df_PreguntaB",Pregunta_e2_2,conn)
     CLASES = ['Economy','Comfort', 'Business']
-    AVION_CR2 = [83311, 0, 0]
-    AVION_CN1 = [8095, 0, 0]
-    AVION_733 = [42988, 0, 4365]
+    AVION_CR2 = [8939, 0, 0]
+    AVION_CN1 = [601, 0, 0]
+    AVION_SU9 = [20880, 0, 2975]
     # Crear la figura y el eje
     fig, ax = plt.subplots()
     # Crear la gráfica
     plt.plot(CLASES, AVION_CR2, label="CR2", marker='o', linestyle='-', color='#3A95B1')
     plt.plot(CLASES, AVION_CN1, label="CN1", marker='o', linestyle='-', color= '#BCE4D8')
-    plt.plot(CLASES, AVION_733, label="733", marker='o', linestyle='-', color= '#7CC098')
-    # Personalizar la gráfica
+    plt.plot(CLASES, AVION_SU9, label="SU9", marker='o', linestyle='-', color= '#7CC098')
     plt.xlabel("Condicion de vuelo")
     plt.ylabel("tickets vendidos")
     plt.title("Tickets vendidos por condicion de vuelo")
     ax.grid(True)  # Agregar líneas de cuadrícula
     ax.legend(loc='upper right')  # Mover la leyenda a la esquina superior derecha
     plt.legend()
-    # Mostrar la gráfica
-    plt.show()
     st.pyplot(fig)
-    expandir = st.expander("Ver interpretacion")
-    expandir.write("Al analizar el gráfico de barras apiladas, contamos con que el avión CR2 tiene la mayor cantidad de asientos vendidos con 83311 asientos en total. El avión 733 cuenta con la segunda mayor cantidad de asientos vendidos, con 47353 asientos en total, mientras que el avión CN1 tiene la menos cantidad de asientos con 8095 asientos vendidos en total. Dentro de cada modelo de avión, podemos decir que la clase económica es el tipo de asiento predominante. En general el gráfico muestra que la clase económica es la más popular por los pasajeros, mientras que en el caso de estas tres aeronaves la clase confort es la menos popular debido a que cuenta con 0 asientos vendidos.")
-    
-
 
 elif option == 'Modelo de regresion':
     

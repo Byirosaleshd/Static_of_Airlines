@@ -30,8 +30,6 @@ SELECT Tipo_de_ticket AS 'Tipo de ticket',
 	   Varianza,
 	   Desviacion_tipica AS 'Desviacion Tipica',
 ROUND((Desviacion_tipica/Precio_Promedio) * 100,2) AS 'Coeficiente de variacion de Pearson'
---	ROUND((Momento3/POW(Desviacion_tipica,3)),2)AS SIMETRIA,
---	ROUND((Momento4/POW(Desviacion_tipica,4)),2) AS KURTOSIS
 	FROM 
 (SELECT fare_conditions AS Tipo_de_ticket, 
 	   COUNT(fare_conditions) AS Frecuencia,
@@ -43,14 +41,12 @@ ROUND((Desviacion_tipica/Precio_Promedio) * 100,2) AS 'Coeficiente de variacion 
 	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),2) AS Varianza,
 	   ROUND(SQRT(
 	    (POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights))
-		),2) AS Desviacion_tipica,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento3,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),4) * COUNT(fare_conditions) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento4
+		),2) AS Desviacion_tipica
 FROM ticket_flights
 GROUP BY fare_conditions
 ORDER BY Frecuencia DESC);
 
-SELECT * FROM Pregunta_2
+SELECT * FROM Pregunta_2;
 
 
 --3. Calcular las estadísticas básicas de los tickets dado el aeropuerto de destino.
@@ -65,9 +61,7 @@ SELECT arrival_airport AS 'Aeropuerto de destino',
 	   Precio_Promedio AS 'Precio Promedio',
 	   ROUND(Varianza) AS Varianza,
 	   ROUND(Desviacion_tipica) AS 'Desviacion tipica',
-	(Desviacion_tipica/Precio_Promedio) * 100 AS 'Coeficiente de variacion de Pearson',
-	ROUND(Momento3/Varianza * Desviacion_tipica) AS Simetria,
-	ROUND(Desviacion4/Varianza * Varianza) AS KURTOSIS
+	ROUND((Desviacion_tipica/Precio_Promedio) * 100 ,2) AS 'Coeficiente de variacion de Pearson'
 	FROM 
 (SELECT arrival_airport,
 	   fare_conditions AS Tipo_de_ticket, 
@@ -78,12 +72,9 @@ SELECT arrival_airport AS 'Aeropuerto de destino',
 	   MAX(amount) - MIN(amount) AS Rango,
 	   ROUND(AVG(amount),2) AS Precio_Promedio,
 	   ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) AS Varianza,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion3,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) AS Desviacion4,
 	   SQRT(
 	    ROUND((POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),2) /(SELECT COUNT(fare_conditions) FROM ticket_flights)),10) 
-		) AS Desviacion_tipica,
-	   POW(amount - (SELECT avg_amount FROM (SELECT AVG(amount) AS avg_amount FROM ticket_flights)),3) /(SELECT COUNT(fare_conditions) FROM ticket_flights) AS Momento3
+		) AS Desviacion_tipica
 FROM ticket_flights
 INNER JOIN flights
 ON ticket_flights.flight_id = flights.flight_id
@@ -95,7 +86,58 @@ LIMIT 10;
 SELECT * FROM Pregunta_3;		  
 	  
 --4. Se requiere calcular la distancia en KM de los distintos aeropuertos que existen en la base de datos y con esta nueva variable mostrar las estadísticas básicas con respecto a la distancia de los vuelos.
-CREATE VIEW Pregunta_4 AS
+
+-- Respuesta Forma 1
+CREATE VIEW Pregunta_4_Forma_1  AS
+SELECT *,
+	ROUND((Desviacion_tipica/Promedio_distancia) * 100 ,2 )AS 'Coeficiente de variacion de Pearson'
+	FROM (
+SELECT
+    Ciudad_salida AS 'Ciudad de salida',
+    Ciudad_llegada AS 'Ciudad de llegada',
+    flight_id 'Numero de vuelo',
+	ROUND(AVG(distancia_km),2) AS Promedio_distancia,
+	ROUND((POW(distancia_km - (SELECT avg_distancia FROM (SELECT AVG(distancia_km) AS avg_distancia FROM ticket_flights)),2) * COUNT(distancia_km) /(SELECT COUNT(distancia_km) FROM ticket_flights)),2) AS Varianza,
+	 ROUND(SQRT(
+	    (POW(distancia_km  - (SELECT avg_distancia FROM (SELECT AVG(distancia_km ) AS avg_distancia FROM ticket_flights)),2) * COUNT(distancia_km) /(SELECT COUNT(distancia_km ) FROM ticket_flights))
+		),2) AS Desviacion_tipica
+FROM (
+    SELECT
+        flight_id,
+        Ciudad_salida,
+        Ciudad_llegada,
+        2 * 6371 * ASIN(SQRT(
+            POWER(SIN(RADIANS((to_latitude - from_latitude) / 2)), 2) +
+            COS(RADIANS(from_latitude)) * COS(RADIANS(to_latitude)) *
+            POWER(SIN(RADIANS((to_longitude - from_longitude) / 2)), 2)
+        )) AS distancia_km
+    FROM (SELECT    
+    flights.flight_id,
+    json_extract(departure.city, '$.en') AS Ciudad_salida,
+    CAST(SUBSTR(departure.coordinates, 2, INSTR(departure.coordinates, ',') - 2) AS REAL) AS from_longitude,
+    CAST(SUBSTR(departure.coordinates, INSTR(departure.coordinates, ',') + 1, LENGTH(departure.coordinates) - INSTR(departure.coordinates, ',') - 2) AS REAL) AS from_latitude,
+json_extract(arrival.city, '$.en') AS Ciudad_llegada,
+    CAST(SUBSTR(arrival.coordinates, 2, INSTR(arrival.coordinates, ',') - 2) AS REAL) AS to_longitude,
+    CAST(SUBSTR(arrival.coordinates, INSTR(arrival.coordinates, ',') + 1, LENGTH(arrival.coordinates) - INSTR(arrival.coordinates, ',') - 2) AS REAL) AS to_latitude
+    from
+    flights 
+    INNER JOIN airports_data AS departure
+    ON flights.departure_airport = departure.airport_code
+    INNER JOIN airports_data AS arrival
+    ON flights.arrival_airport = arrival.airport_code)
+) AS subquery
+GROUP BY Ciudad_salida, Ciudad_llegada 
+ORDER BY distancia_km DESC);
+
+SELECT * FROM Pregunta_4_Forma_1;
+
+
+
+
+
+-- Respuesta Forma 2
+
+CREATE VIEW Pregunta_4_Forma_2 AS
 SELECT departure_airport,Distancia_km_llegada - Distancia_km_salida AS 'Distancia_recorrida_en _km', 
 arrival_airport, ROUND(Distancia_km_salida,2) AS 'Distancia en km salida',
 ROUND(Distancia_km_llegada,2) AS 'Distancia en km llegada',
@@ -109,56 +151,14 @@ GROUP BY departure_airport
 ORDER BY 'Distancia_recorrida_en_km' DESC
 Limit 10;
 
-SELECT * FROM Pregunta_4
+SELECT * FROM Pregunta_4_Forma_2
 
 
-CREATE TEMP TABLE FLIGHT_INFO AS
-SELECT    
-    flights.flight_id,
-    json_extract(departure.city, '$.en') AS from_city,
-    CAST(SUBSTR(departure.coordinates, 2, INSTR(departure.coordinates, ',') - 2) AS REAL) AS from_longitude,
-    CAST(SUBSTR(departure.coordinates, INSTR(departure.coordinates, ',') + 1, LENGTH(departure.coordinates) - INSTR(departure.coordinates, ',') - 2) AS REAL) AS from_latitude,
 
-json_extract(arrival.city, '$.en') AS to_city,
-    CAST(SUBSTR(arrival.coordinates, 2, INSTR(arrival.coordinates, ',') - 2) AS REAL) AS to_longitude,
-    CAST(SUBSTR(arrival.coordinates, INSTR(arrival.coordinates, ',') + 1, LENGTH(arrival.coordinates) - INSTR(arrival.coordinates, ',') - 2) AS REAL) AS to_latitude
-
-    from
-    flights 
-    left join airports_data as departure
-    on flights.departure_airport = departure.airport_code
-    left join airports_data as arrival
-    on flights.arrival_airport = arrival.airport_code;
-
-
-CREATE TEMP TABLE FLIGHT_INFO_ENRICHED_2 AS
-SELECT
-    from_city,
-    to_city,
-    flight_id,
-
-    AVG(distance_km) AS average_distance_km
-FROM (
-    SELECT
-        flight_id,
-        from_city,
-        to_city,
-        2 * 6371 * ASIN(SQRT(
-            POWER(SIN(RADIANS((to_latitude - from_latitude) / 2)), 2) +
-            COS(RADIANS(from_latitude)) * COS(RADIANS(to_latitude)) *
-            POWER(SIN(RADIANS((to_longitude - from_longitude) / 2)), 2)
-        )) AS distance_km
-    FROM FLIGHT_INFO
-) AS subquery
-GROUP BY from_city, to_city, flight_id
-order by average_distance_km desc	
-
-SELECT * FROM FLIGHT_INFO_ENRICHED_2;
 
 
 
 --5. Indique cuales son los 10 vuelos con mayor cantidad de pasajeros y cuál fue la ruta de estos (aeropuerto de salida y aeropuerto de llegada).
-
 CREATE VIEW Pregunta_5 AS
 SELECT b.flight_id AS 'NUMERO DE VUELO', 
 		COUNT(b.seat_no) AS 'NUMERO DE ASIENTOS OCUPADOS', 
@@ -185,3 +185,4 @@ SELECT b.flight_id AS 'NUMERO DE VUELO',
 
 			
 SELECT * FROM Pregunta_5;
+

@@ -21,7 +21,7 @@ import statsmodels.api as sm #Regression
 import statsmodels.formula.api as smf #Regression
 
 # Conectar a la base de datos SQLite
-conn = sql.connect('Data/travel.sqlite')
+conn = sql.connect('travel.sqlite')
 translator = GoogleTranslator(source="en", target="es")
 
 
@@ -94,7 +94,7 @@ elif option == 'Pregunta A':
 elif option == 'Pregunta A2':
     st.header("¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo?")
     PreguntaA1= s.PreguntaA1
-    df_PreguntaA1 = ft.imprimir_df("df_PreguntaB",PreguntaA1,conn)
+    df_PreguntaA1 = ft.imprimir_df("df_PreguntaA1",PreguntaA1,conn)
     aviones = df_PreguntaA1['CÓDIGO DE AVIÓN']
     vuelos_vendidos_julio = df_PreguntaA1['VUELOS EN 2017-07']
     vuelos_vendidos_agosto = df_PreguntaA1['VUELOS EN 2017-08']
@@ -131,19 +131,38 @@ elif option == 'Pregunta A2':
 
 elif option == 'Pregunta B':
     st.header("¿Qué modelo de avión ha vendido en promedio una mayor cantidad de puestos según la clase del vuelo?:")
-    st.markdown("Puedes seleccionar las columnas que desees")
-    PreguntaB = s.PreguntaB
-    df_PreguntaB = ft.pasar_dataframe("df_PreguntaB",PreguntaB,conn)
-    #df_PreguntaB = ft.imprimir_df("df_PreguntaB",PreguntaB,conn)
-    columnas = list(df_PreguntaB.columns)
-    st.sidebar.write(" ")
-    st.sidebar.write(" ")
-    columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["CodigodeAvion","Economy","Business","Comfort"])
-    data_filt = df_PreguntaB[columnas_seleccionadas]
-    st.dataframe(data_filt,width=550, height=400)
-    ft.Grafico_multibarras(df_PreguntaB,'Economy','Business','Comfort',"Economy","Business","Comfort","Asientos Vendidos","Código de Avion","ASIENTOS VENDIDOS POR AVION")
-    expandir = st.expander("Ver interpretacion")
-    expandir.write(f"Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “773”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en las otras dos clases. Siendo así, la aeronave con mayores asientos vendidos.")
+    st.markdown("Puedes seleccionar las estadisticas que desees")
+    Pregunta_B= s.Pregunta_B
+    df_Pregunta_B = ft.imprimir_df("df_PreguntaB",Pregunta_B,conn)
+    labels = df_Pregunta_B.CodigodeAvion
+    Economy = df_Pregunta_B.Economy
+    Business = df_Pregunta_B.Business
+    Comfort = df_Pregunta_B.Comfort
+
+    x = np.arange(len(labels))
+    width = 0.25
+    fig, ax = plt.subplots()
+    barra1 = ax.bar(x-0.30, Economy, width, label='Economy', color='#87CEFA')
+    barra2 = ax.bar(x, Business, width, label='Business', color='#4169E1')
+    barra3 = ax.bar(x+0.30, Comfort, width, label='Comfort', color='#1E90FF')
+    ax.set_ylabel('Asientos Vendidos')
+    ax.set_xlabel('Código de Avion')
+    ax.set_title('ASIENTOS VENDIDOS POR AVION')
+    ax.set_xticks(x, labels)
+
+    ax.legend()
+
+    ax.bar_label(barra1, padding=1, fontsize=5)
+    ax.bar_label(barra2, padding=1, fontsize=5)
+    ax.bar_label(barra3, padding=1, fontsize=5)
+
+    ax.set_ylim(0,185000)
+    fig.tight_layout()
+
+    plt.show()
+    st.pyplot(fig)
+    columnas = list(df_Pregunta_B.columns)
+    st.markdown("Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “773”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en las otras dos clases. Siendo así, la aeronave con mayores asientos vendidos.")
 
 
 

@@ -37,7 +37,7 @@ conn = sql.connect('travel.sqlite')
 translator = GoogleTranslator(source="en", target="es")
 
 
-logo = Image.open(r'Images/Avions.jpeg')
+logo = Image.open(r'Avions.jpeg')
 st.sidebar.image(logo, width=200)
 st.sidebar.header("Presentación")
 st.sidebar.write(" ")

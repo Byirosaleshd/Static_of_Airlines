@@ -7,20 +7,20 @@ import plotly.express as px #Graficos
 import plotly.graph_objs as go #Graficos
 import sqlite3 as sql #Database
 import numpy as np # Algebra lineal
-from sklearn.linear_model import LinearRegression #Regression
-from sklearn.model_selection import train_test_split #Regression
-from sklearn.metrics import r2_score #Regression
+#from sklearn.linear_model import LinearRegression #Regression
+#from sklearn.model_selection import train_test_split #Regression
+#from sklearn.metrics import r2_score #Regression
 import Functions as ft #Functions for this program
 import datetime as dt #Control for Time
 from pandas import json_normalize #Json utilities
-import json #Json utilites
+#import json #Json utilites
 import Sql as s #Sql querys
 from PIL import Image #Images
 from deep_translator import GoogleTranslator #Traducir
 import statsmodels.api as sm #Regression
 import statsmodels.formula.api as smf #Regression
-import statsmodels.api as sm #Prueba de normalidad de residuos
-from scipy import stats #Homosteceidad
+#import statsmodels.api as sm #Prueba de normalidad de residuos
+#from scipy import stats #Homosteceidad
 
 # Conectar a la base de datos SQLite
 conn = sql.connect('DATA/travel.sqlite')
@@ -34,7 +34,7 @@ st.sidebar.write(" ")
 st.sidebar.write(" ")
 option = st.sidebar.selectbox(
     'Selecciona una pagina para navegar por la app',
-    ('Presentacion', 'Planteamiento', 'Campos de la BBDD', 'Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D", "Pregunta E","Modelo de regresion"))
+    ('Presentacion','Introducción', 'Planteamiento', 'Obejtivos', 'Campos de la BBDD', 'Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D", "Pregunta E","Modelo de regresion"))
 if option == 'Presentacion':
     st.write(" ")
     st.write(" ")
@@ -55,9 +55,18 @@ if option == 'Presentacion':
     col1, col2 = st.columns(2)
     col1.expander("Presentado por").write("- Ignacio Rosales\n- Lucia Bugallo\n- Daniel Sierra\n- María Alcalá\n- Daniel Aristiguieta")
     col2.expander("Git-hub").write("[Repositorio](https://github.com/Byirosaleshd/Static_of_Airlines)")
-    
+
+elif option == 'Introducción':
+    st.title("Introducción")
+    st.markdown("""Nuestro mundo actual está compuesto de conexiones masivas a nivel tecnológico, de comunicación y por supuesto, en los medios de transporte, existiendo alternativas habituales tales como transporte terrestre, transporte marítimo y transporte aéreo. El desarrollo de estas conexiones ha permitido construir cercanías entre civilizaciones remotas y no tan remotas, promoviendo el enriquecimiento e intercambio cultural, el aprendizaje a diversos países y el satisfactorio desarrollo de una economía estable.
+Curiosamente, al referirse al transporte aéreo, concretamente a los aviones, es normal asociarlo con la practica del turismo, esto se debe a que hay ciertas regiones del planeta que reciben una mayor afluencia de personas, siendo escogidos por cumplir legados a nivel histórico, musical, económico, cultural, entre otros. Sin embargo, no es el único uso que puede dársele a los vuelos existiendo categorías como vuelos comerciales (encargados de transportan pasajeros y carga entre aeropuertos), vuelos privados (que transportan pasajeros o carga para empresas o individuos), vuelos nacionales(que cubren el territorio de un país conectando los aeropuertos de sus distintas ciudades), vuelos internacionales (tienen como destino un país distinto al que se inició el vuelo) y vuelos de negocio (encargados de transportar ejecutivos o empresarios para reuniones o negociaciones). 
+De esta forma, para la movilización de personas y mercancías a nivel mundial los aviones son el transporte predilecto, permitiendo establecer, además, la existencia de los aeropuertos. Para la Real Academia Española (RAE) un aeropuerto es descrito como “Aeródromo en el que existen, de modo permanente, instalaciones y servicios con carácter público, para asistir de modo regular al tráfico aéreo, permitir el aparcamiento y las reparaciones del material aéreo y recibir o despachar pasajeros o carga”, es decir, los aeropuertos están diseñados para manejar el tráfico aéreo de manera regular, permitiendo  recibir y despachar aviones de manera continua aseverando el manejo de flujo constante de aeronaves, pasajeros y carga.
+Del mismo modo, los aeropuertos llevan las estadísticas oportunas de los vuelos programados a salir y a llegar, los tipos de tickets vendidos, el costo de los vuelos, datos propios sobre los aviones y mucha información resguardada en bases de datos que es necesaria para realizar análisis predictivos, con el fin de lograr antecederse a situaciones extraordinarias que desafíen las operaciones y pongan en riesgo la seguridad operativa, la eficiencia y la experiencia del pasajero. 
+Es importante destacar que, para la realización de este estudio fue necesario determinar que la BBDD cuya información nos ofrecía correspondía al seguimiento de vuelos transcurridos en el año 2017 en el país transcontinental de Rusia, permitiéndonos explorar los modelos de aviones, sus aeropuertos, la cantidad de tickets vendidos, entre otras variables importantes para la presentación de resultados. """)
+
+
 elif option == 'Planteamiento':
-    st.header("Planteamiento")
+    st.title("Planteamiento")
     st.markdown("Determinar el mejor modelo de avión para vuelos más eficientes en distintos aeropuertos de los continentes de Asia y Europa durante el año 2017")
     st.markdown("a) ¿Qué modelo de avión realiza una mayor cantidad de vuelos, y cuál lo hace en un menor tiempo? ")
     st.markdown("b) ¿Qué modelo de avión ha vendido en promedio una mayor cantidad de puestos según la clase del vuelo?")
@@ -70,6 +79,16 @@ elif option == 'Planteamiento':
     st.markdown("e) Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente:")
     st.markdown("   - El promedio y la variabilidad de los vuelos realizados.")
     st.markdown("   - ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Económica?")
+
+
+elif option == 'Obejtivos':
+    st.header("Objetivo General")
+    st.markdown("Determinar el mejor modelo de avión para vuelos más eficientes en distintos aeropuertos de los continentes de Asia y Europa durante el año 2017")
+    st.header("Obejtivos Específicos")
+    st.markdown(""" 
+    1. Identificar las cuidades que reciben mayor cantidad de vuelos.
+    2.	Definir el tiempo de vuelo entre los modelos de aviones.
+    3.	Analizar la cantidad de personas que realizan los vuelos.""")
 
 
 elif option == 'Campos de la BBDD':

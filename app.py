@@ -357,6 +357,9 @@ elif option == 'Pregunta E':
     #data_filt = df_Pregunta_E1[columnas_seleccionadas]
     #st.dataframe(data_filt,width=550, height=400)
     ft.grafico_pie_nueva(df_Pregunta_E1)
+    expandir = st.expander("Ver interpretacion")
+    expandir.write(f"Entre estos tres modelos de aviones tenemos que el 44% de vuelos realizados y que llegaron a su destino pertenece al avión cuyo código es “SU9” con un total de 498 vuelos al aeropuerto DME (aeropuerto con mayor número de llegadas), mientras que el CR2 cuenta con 417 vuelos a dicho destino y el CN1 con 100 vuelos menos que el CR2.")
+
 
     st.title("Entre los modelos de aviones con los códigos: CR2, SU9 y CN1 se desea conocer lo siguiente: vuelos realizados al aeropuerto DME")
     Pregunta_e2_2= s.E2_2
@@ -378,6 +381,9 @@ elif option == 'Pregunta E':
     ax.legend(loc='upper right')  # Mover la leyenda a la esquina superior derecha
     plt.legend()
     st.pyplot(fig)
+    expandir = st.expander("Ver interpretacion")
+    expandir.write(f"Al analizar el gráfico de barras representadas con puntos, contamos con que el avión SU9 tiene la mayor cantidad de asientos vendidos para el destino en el aeropuerto DME con 23.855 asientos en total. El avión CR2 cuenta con la segunda mayor cantidad de asientos vendidos, con 8.939 asientos en total, mientras que el avión CN1 tiene la menos cantidad de asientos con 601 asientos vendidos en total. Dentro de cada modelo de avión, podemos decir que la clase económica es el tipo de asiento predominante. En general el gráfico muestra que la clase económica es la más popular por los pasajeros, mientras que en el caso de estas tres aeronaves la clase confort es la menos popular debido a que cuenta con 0 asientos vendidos.")
+
 
 elif option == 'Modelo de regresion':
         #-- TABLA DEL RANGO

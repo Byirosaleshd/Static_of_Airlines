@@ -7,9 +7,6 @@ import plotly.express as px #Graficos
 import plotly.graph_objs as go #Graficos
 import sqlite3 as sql #Database
 import numpy as np # Algebra lineal
-from sklearn.linear_model import LinearRegression #Regression
-from sklearn.model_selection import train_test_split #Regression
-from sklearn.metrics import r2_score #Regression
 import Functions as ft #Functions for this program
 import datetime as dt #Control for Time
 from pandas import json_normalize #Json utilities
@@ -17,6 +14,8 @@ import json #Json utilites
 import Sql as s #Sql querys
 from PIL import Image #Images
 from deep_translator import GoogleTranslator #Traducir
+import statsmodels.api as sm #Regression
+import statsmodels.formula.api as smf #Regression
 
 
 

@@ -10,6 +10,7 @@ import numpy as np # Algebra lineal
 import Functions as ft #Functions for this program
 import datetime as dt #Control for Time
 from pandas import json_normalize #Json utilities
+import json #Json utilites
 import Sql as s #Sql querys
 from PIL import Image #Images
 from deep_translator import GoogleTranslator #Traducir

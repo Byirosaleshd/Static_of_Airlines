@@ -16,6 +16,20 @@ from PIL import Image #Images
 from deep_translator import GoogleTranslator #Traducir
 import statsmodels.api as sm #Regression
 import statsmodels.formula.api as smf #Regression
+import zipfile 
+
+# Nombre del archivo ZIP
+zipfilename = "archive.zip"
+
+# Contraseña (si está protegido)
+password = None
+
+# Abre y extrae todos los archivos en el ZIP
+try:
+    with zipfile.ZipFile(zipfilename, "r") as z:
+        z.extractall(pwd=password)
+except Exception as e:
+    print("Error al extraer el archivo ZIP:", e)
 
 
 # Conectar a la base de datos SQLite

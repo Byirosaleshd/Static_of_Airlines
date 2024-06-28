@@ -44,7 +44,7 @@ st.sidebar.write(" ")
 st.sidebar.write(" ")
 option = st.sidebar.selectbox(
     'Selecciona una pagina para navegar por la app',
-    ('Presentacion','Introducción', 'Planteamiento', 'Obejtivos', 'Campos de la BBDD', 'Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D", "Pregunta E","Modelo de regresion"))
+    ('Presentacion','Introducción', 'Planteamiento', 'Obejtivos', 'Campos de la BBDD', 'Pregunta A', 'Pregunta B',"Pregunta C","Pregunta D", "Pregunta E","Modelo de regresion", 'Conclusión'))
 if option == 'Presentacion':
     st.write(" ")
     st.write(" ")
@@ -464,7 +464,15 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     st.pyplot(fig)
     
 
-
+elif option == 'Conclusión':
+    st.title("Conclusión")
+    st.markdown("""
+Dentro de esta investigación estadística, se analizó la eficiencia de diferentes modelos de aviones cuyos vuelos fueron realizados en Rusia durante el año 2017. Además, se utilizó una base de datos que contenía información sobre nueve modelos de aviones pertenecientes a las familias Boeing, Airbus, Sukhoi, Cessna y Bombardier. 
+De igual forma, se pudo determinar que, en ocasiones, porque un avión cuente con un valor de su alcance una cifra superior a los demás modelos eso no es indicativo a que un avión venda una mayor cantidad de puestos o realice viajes con más frecuencias, acá lo que condiciona la implementación habitual son los usuarios que ajustan su presupuesto al precio de un boleto de avión y, por ende, al modelo de un avión.  						 
+Además, se analizó la frecuencia de vuelos entre los continentes de Asia y Europa, y se encontró que la ruta con mayor frecuencia de vuelos realizada por los aviones fue la ruta Europa-Europa, asegurando al mismo tiempo, que el aeropuerto que recibió una mayor cantidad de vuelos provenientes de aerolíneas europeas fue el aeropuerto de Moscú.
+En general, este estudio proporciona una visión detallada de la eficiencia de diferentes modelos de aviones en vuelos comerciales en Rusia, lo que puede ser útil para las aerolíneas y los fabricantes de aviones que buscan mejorar su eficiencia y rentabilidad.
+«El hombre debe elevarse por encima de la Tierra, hasta la cima de la atmósfera y más allá, pues sólo así podrá comprender plenamente el mundo en el que vive».
+–Sócrates""")
 
 
 

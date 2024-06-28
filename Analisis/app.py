@@ -19,7 +19,7 @@ import statsmodels.formula.api as smf #Regression
 import zipfile 
 
 # Nombre del archivo ZIP
-zipfilename = "DATA/archive.zip"
+zipfilename = "archive.zip"
 
 # Contraseña (si está protegido)
 password = None
@@ -33,7 +33,7 @@ except Exception as e:
 
 
 # Conectar a la base de datos SQLite
-conn = sql.connect('DATA/travel.sqlite')
+conn = sql.connect('travel.sqlite')
 translator = GoogleTranslator(source="en", target="es")
 
 

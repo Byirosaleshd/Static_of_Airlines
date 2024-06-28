@@ -431,7 +431,7 @@ elif option == 'Modelo de regresion':
     conn.create_function('COS', 1, cos_udf)
     
     def power_udf(x):
-        return math.power(x)
+        return math.pow(x)
     
     conn.create_function('POWER',1, power_udf)
 

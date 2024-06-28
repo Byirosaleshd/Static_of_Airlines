@@ -421,14 +421,19 @@ elif option == 'Modelo de regresion':
     conn.create_function('RADIANS', 1, radians_udf)
 
     def sin_udf(x):
-        return math.radins(x)
+        return math.sin(x)
     
     conn.create_function('SIN', 1, sin_udf)
 
     def cos_udf(x):
         return math.cos(x)
     
-    conn.create_function('Cos', 1, cos_udf)
+    conn.create_function('COS', 1, cos_udf)
+    
+    def power_udf(x):
+        return math.power(x)
+    
+    conn.create_function('POWER',1, power_udf)
 
 
     cursor.execute("""

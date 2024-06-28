@@ -430,10 +430,11 @@ elif option == 'Modelo de regresion':
     
     conn.create_function('COS', 1, cos_udf)
     
-    def power_udf(x):
-        return math.pow(x)
-    
-    conn.create_function('POWER',1, power_udf)
+    # Define the POW function
+    def pow_udf(base, exponent):
+        return base ** exponent
+
+    conn.create_function("POWER", 2, pow_udf)
 
 
     cursor.execute("""

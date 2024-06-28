@@ -409,6 +409,12 @@ elif option == 'Modelo de regresion':
     def sqrt_udf(x):
         return math.sqrt(x)
     conn.create_function('SQRT', 1, sqrt_udf)
+    
+    def asin_udf(x):
+        return math.asin(x)
+
+    conn.create_function('ASIN', 1, asin_udf)
+
     cursor.execute("""
     SELECT
         flight_id,
@@ -433,6 +439,8 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     ON flights.departure_airport = departure.airport_code
     INNER JOIN airports_data AS arrival
     ON flights.arrival_airport = arrival.airport_code);""")
+
+    print(cursor.fetchone()[0])  # Imprime el resultado de la función ASIN
 
     
     

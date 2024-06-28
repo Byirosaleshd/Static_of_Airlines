@@ -420,6 +420,17 @@ elif option == 'Modelo de regresion':
 
     conn.create_function('RADIANS', 1, radians_udf)
 
+    def sin_udf(x):
+        return math.radins(x)
+    
+    conn.create_function('SIN', 1, sin_udf)
+
+    def cos_udf(x):
+        return math.cos(x)
+    
+    conn.create_function('Cos', 1, cos_udf)
+
+
     cursor.execute("""
     SELECT
         flight_id,

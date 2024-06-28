@@ -386,25 +386,6 @@ elif option == 'Pregunta E':
 
 
 elif option == 'Modelo de regresion':
-        #-- TABLA DEL RANGO
-    aircrafts_data = "SELECT * FROM aircrafts_data;"
-    Df_aircrafts_data = ft.read_abilities(aircrafts_data,conn)
-
-    #-- TABLA DEL Monto total de las reservas
-    bookings = "SELECT * FROM bookings;"
-    Df_bookings = ft.read_abilities(bookings,conn)
-
-    #-- TABLA DEL PRECIO DE VENTA
-    ticket_flights = "SELECT * FROM ticket_flights;"
-    Df_ticket_flights = ft.read_abilities(ticket_flights,conn)
-
-    flights = "SELECT * FROM flights;"
-    Df_flights = ft.read_abilities(flights,conn)
-    
-    tickets = "SELECT * FROM tickets;"
-    Df_tickets = ft.read_abilities(tickets,conn)    
-    
-
     cursor = conn.cursor()
     def sqrt_udf(x):
         return math.sqrt(x)
@@ -465,13 +446,25 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     Distancia = cursor.fetchall()
     Df_distancia = pd.DataFrame(Distancia, columns=[desc[0] for desc in cursor.description])
 
-#    cols = [column[0] for column in query.description]  # Obtiene los nombres de las columnas
-#    df = pd.DataFrame.from_records(data=query.fetchall(), columns=cols)
+            #-- TABLA DEL RANGO
+    aircrafts_data = "SELECT * FROM aircrafts_data;"
+    Df_aircrafts_data = ft.read_abilities(aircrafts_data,conn)
+
+    #-- TABLA DEL Monto total de las reservas
+    bookings = "SELECT * FROM bookings;"
+    Df_bookings = ft.read_abilities(bookings,conn)
+
+    #-- TABLA DEL PRECIO DE VENTA
+    ticket_flights = "SELECT * FROM ticket_flights;"
+    Df_ticket_flights = ft.read_abilities(ticket_flights,conn)
+
+    flights = "SELECT * FROM flights;"
+    Df_flights = ft.read_abilities(flights,conn)
     
-
-
-
-#    Df_distancia = ft.read_abilities(Distancia,conn)  
+    tickets = "SELECT * FROM tickets;"
+    Df_tickets = ft.read_abilities(tickets,conn)    
+    
+    
 
     Merged_df = Df_ticket_flights.merge(Df_flights, on='flight_id', how='inner')
     Merged_df = Df_aircrafts_data.merge(Merged_df, on='aircraft_code', how='inner' )

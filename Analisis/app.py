@@ -19,7 +19,7 @@ import statsmodels.formula.api as smf #Regression
 import zipfile 
 
 # Nombre del archivo ZIP
-zipfilename = "archive.zip"
+zipfilename = "DATA/archive.zip"
 
 # Contraseña (si está protegido)
 password = None

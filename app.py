@@ -437,7 +437,7 @@ elif option == 'Modelo de regresion':
     conn.create_function("POWER", 2, pow_udf)
 
 
-     Distancia  = cursor.execute("""
+     cursor.execute("""
     SELECT
         flight_id,
         Ciudad_salida,
@@ -462,9 +462,16 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     INNER JOIN airports_data AS arrival
     ON flights.arrival_airport = arrival.airport_code);""")
     
+    Distancia = cursor.fetchall()
+    Df_distancia = pd.DataFrame(results, columns=[desc[0] for desc in cursor.description])
+
+#    cols = [column[0] for column in query.description]  # Obtiene los nombres de las columnas
+#    df = pd.DataFrame.from_records(data=query.fetchall(), columns=cols)
+    
 
 
-    Df_distancia = ft.read_abilities(Distancia,conn)  
+
+#    Df_distancia = ft.read_abilities(Distancia,conn)  
 
     Merged_df = Df_ticket_flights.merge(Df_flights, on='flight_id', how='inner')
     Merged_df = Df_aircrafts_data.merge(Merged_df, on='aircraft_code', how='inner' )

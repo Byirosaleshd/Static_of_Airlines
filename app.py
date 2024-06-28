@@ -437,7 +437,7 @@ elif option == 'Modelo de regresion':
     conn.create_function("POWER", 2, pow_udf)
 
 
-    cursor.execute("""
+     Distancia  = cursor.execute("""
     SELECT
         flight_id,
         Ciudad_salida,
@@ -461,12 +461,8 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     ON flights.departure_airport = departure.airport_code
     INNER JOIN airports_data AS arrival
     ON flights.arrival_airport = arrival.airport_code);""")
-
-    print(cursor.fetchone()[0])  # Imprime el resultado de la función ASIN
-
     
-    
-    Distancia 
+
 
     Df_distancia = ft.read_abilities(Distancia,conn)  
 

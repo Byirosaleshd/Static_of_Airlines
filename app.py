@@ -17,6 +17,8 @@ from deep_translator import GoogleTranslator #Traducir
 import statsmodels.api as sm #Regression
 import statsmodels.formula.api as smf #Regression
 import zipfile 
+import math
+
 
 # Nombre del archivo ZIP
 zipfilename = "archive.zip"
@@ -37,8 +39,8 @@ conn = sql.connect('travel.sqlite')
 translator = GoogleTranslator(source="en", target="es")
 
 
-#logo = Image.open(r'Avions.jpeg')
-#st.sidebar.image(logo, width=200)
+logo = Image.open(r'Images/Avions.jpeg')
+st.sidebar.image(logo, width=200)
 st.sidebar.header("Presentación")
 st.sidebar.write(" ")
 st.sidebar.write(" ")
@@ -48,13 +50,13 @@ option = st.sidebar.selectbox(
 if option == 'Presentacion':
     st.write(" ")
     st.write(" ")
-#    Crj = Image.open(r'images/crj-200.jpg')
+    Crj = Image.open(r'Images/crj-200.jpg')
     st.sidebar.header('Recursos utilizados')
     st.sidebar.markdown('''
 - [Database de Aerolineas](https://www.kaggle.com/datasets/saadharoon27/airlines-dataset/data) De donde salio la informacion
 ''')
     col1, col2 = st.columns((1,4))
-#    col2.image(Crj, width=300)
+    col2.image(Crj, width=300)
     st.write(" ")
     st.write(" ")
     st.markdown("# Determinar el mejor modelo de avión para vuelos más eficientes en distintos aeropuertos de Rusia durante el año 2017")
@@ -396,7 +398,12 @@ elif option == 'Modelo de regresion':
     tickets = "SELECT * FROM tickets;"
     Df_tickets = ft.read_abilities(tickets,conn)    
     
-    Distancia = """
+
+    cursor = conn.cursor()
+    def sqrt_udf(x):
+        return math.sqrt(x)
+    conn.create_function('SQRT', 1, sqrt_udf)
+    cursor.execute("""
     SELECT
         flight_id,
         Ciudad_salida,
@@ -419,8 +426,12 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     INNER JOIN airports_data AS departure
     ON flights.departure_airport = departure.airport_code
     INNER JOIN airports_data AS arrival
-    ON flights.arrival_airport = arrival.airport_code);
-"""
+    ON flights.arrival_airport = arrival.airport_code);""")
+
+    
+    
+    Distancia 
+
     Df_distancia = ft.read_abilities(Distancia,conn)  
 
     Merged_df = Df_ticket_flights.merge(Df_flights, on='flight_id', how='inner')

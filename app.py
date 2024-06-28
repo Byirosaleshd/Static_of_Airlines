@@ -414,6 +414,11 @@ elif option == 'Modelo de regresion':
         return math.asin(x)
 
     conn.create_function('ASIN', 1, asin_udf)
+    
+    def radians_udf(x):
+        return math.radians(x)
+
+    conn.create_function('RADIANS', 1, radians_udf)
 
     cursor.execute("""
     SELECT

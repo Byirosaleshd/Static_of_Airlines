@@ -463,7 +463,7 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     ON flights.arrival_airport = arrival.airport_code);""")
     
     Distancia = cursor.fetchall()
-    Df_distancia = pd.DataFrame(results, columns=[desc[0] for desc in cursor.description])
+    Df_distancia = pd.DataFrame(Distancia, columns=[desc[0] for desc in cursor.description])
 
 #    cols = [column[0] for column in query.description]  # Obtiene los nombres de las columnas
 #    df = pd.DataFrame.from_records(data=query.fetchall(), columns=cols)

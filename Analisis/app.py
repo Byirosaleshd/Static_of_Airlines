@@ -37,8 +37,8 @@ conn = sql.connect('travel.sqlite')
 translator = GoogleTranslator(source="en", target="es")
 
 
-logo = Image.open(r'Avions.jpeg')
-st.sidebar.image(logo, width=200)
+#logo = Image.open(r'Avions.jpeg')
+#st.sidebar.image(logo, width=200)
 st.sidebar.header("Presentación")
 st.sidebar.write(" ")
 st.sidebar.write(" ")
@@ -48,7 +48,7 @@ option = st.sidebar.selectbox(
 if option == 'Presentacion':
     st.write(" ")
     st.write(" ")
-    Crj = Image.open(r'images/crj-200.jpg')
+#    Crj = Image.open(r'images/crj-200.jpg')
     st.sidebar.header('Recursos utilizados')
     st.sidebar.markdown('''
 - [Database de Aerolineas](https://www.kaggle.com/datasets/saadharoon27/airlines-dataset/data) De donde salio la informacion

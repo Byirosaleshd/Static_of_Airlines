@@ -72,9 +72,9 @@ elif option == 'Planteamiento':
     st.markdown("d) Si los aviones realizan vuelos entre los continentes de Asia y Europa:")
     st.markdown("   - ¿Cuáles son las ciudades en recibir vuelos cuyo modelo de avión pertenece al código 763?")
     st.markdown("   - Dentro de los aeropuertos asiáticos, ¿Quiénes recibe una mayor cantidad de vuelos provenientes de aerolineas europeas?")
-    st.markdown("e) Entre los modelos de aviones con los códigos: CR2, 733 y CN1 se desea conocer lo siguiente:")
-    st.markdown("   - El promedio y la variabilidad de los vuelos realizados.")
-    st.markdown("   - ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos pertenecientes a la clase Económica?")
+    st.markdown("e) Entre los modelos de aviones con los códigos: CR2, SU9 y CN1 se desea conocer lo siguiente:")
+    st.markdown("   - Vuelos realizados al aeropuerto DME.")
+    st.markdown("   - ¿Cuántos de estos modelos tienen una mayor cantidad de vuelos realizados con boletos vendidos para el destino en DME?")
 
 
 elif option == 'Obejtivos':

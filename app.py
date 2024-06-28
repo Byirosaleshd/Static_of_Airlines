@@ -437,7 +437,7 @@ elif option == 'Modelo de regresion':
     conn.create_function("POWER", 2, pow_udf)
 
 
-     cursor.execute("""
+    cursor.execute("""
     SELECT
         flight_id,
         Ciudad_salida,

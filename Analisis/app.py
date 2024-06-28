@@ -54,7 +54,7 @@ if option == 'Presentacion':
 - [Database de Aerolineas](https://www.kaggle.com/datasets/saadharoon27/airlines-dataset/data) De donde salio la informacion
 ''')
     col1, col2 = st.columns((1,4))
-    col2.image(Crj, width=300)
+#    col2.image(Crj, width=300)
     st.write(" ")
     st.write(" ")
     st.markdown("# Determinar el mejor modelo de avión para vuelos más eficientes en distintos aeropuertos de Rusia durante el año 2017")

@@ -19,14 +19,16 @@ from PIL import Image #Images
 from deep_translator import GoogleTranslator #Traducir
 import statsmodels.api as sm #Regression
 import statsmodels.formula.api as smf #Regression
+import statsmodels.api as sm #Prueba de normalidad de residuos
+from scipy import stats #Homosteceidad
 
 # Conectar a la base de datos SQLite
 conn = sql.connect('DATA/travel.sqlite')
 translator = GoogleTranslator(source="en", target="es")
 
 
-logo = Image.open(r'Images/avion.png')
-st.sidebar.image(logo, width=100)
+logo = Image.open(r'Images/Avions.jpeg')
+st.sidebar.image(logo, width=200)
 st.sidebar.header("Presentación")
 st.sidebar.write(" ")
 st.sidebar.write(" ")
@@ -164,12 +166,6 @@ elif option == 'Pregunta A':
     ax.legend()
     plt.show()
     st.pyplot(fig)
-
-
-
-    
-    
-
     expandir = st.expander("Ver interpretacion")
     expandir.write(f"Al analizar la distribución de las barras, podemos ver que el avión CN1 es el que más vuelos vendió en ambos meses, mientras que el avión 773 vendió menos vuelos en comparación. Y al ser un gráfico de barras apiladas tenemos que la barra de Julio es más larga que la barra de agosto, lo que indica que se vendieron más vuelos en Julio que en agosto; esto puede ser debido a que julio es un mes de alta demanda para viajes debido a las vacaciones de verano en algunos países, lo que podría explicar el aumento en la cantidad de vuelos vendidos.")
 
@@ -177,7 +173,6 @@ elif option == 'Pregunta A':
     st.markdown("Alcance de Aviones")
     PreguntaA2 = s.PreguntaA2
     df_PreguntaA2 = ft.imprimir_df("df_PreguntaB",PreguntaA2,conn)
-    
     x = df_PreguntaA2['CODIGO DE AVION']
     y = df_PreguntaA2['ALCANCE DEL AVION']
     fig, ax = plt.subplots()
@@ -186,8 +181,7 @@ elif option == 'Pregunta A':
     ax.set_ylabel('Alcance')
     ax.set_title('Alcance por avión')
     plt.show() 
-    st.plotly_chart(fig)  
-    
+    st.pyplot(fig)    
     expandir = st.expander("Ver interpretacion")
     expandir.write(f"El avión con un mayor alcance es el 773, en comparación a los demás.")
 
@@ -200,96 +194,31 @@ elif option == 'Pregunta B':
     Pregunta_B = s.Pregunta_B
     df_PreguntaB = ft.pasar_dataframe("df_PreguntaB",Pregunta_B,conn)
     df_Pregunta_B = ft.imprimir_df("df_PreguntaB",Pregunta_B,conn)
-    columnas = list(df_PreguntaB.columns)
-    st.sidebar.write(" ")
-    st.sidebar.write(" ")
-    columnas_seleccionadas = st.sidebar.multiselect('Selecciona las columnas a mostrar', columnas, default=["CodigodeAvion","Economy","Business","Comfort"])
-    data_filt = df_PreguntaB[columnas_seleccionadas]
-    st.dataframe(data_filt,width=550, height=400)
-#     ft.Grafico_multibarras(df_PreguntaB,'Economy','Business','Comfort',"Economy","Business","Comfort","Asientos Vendidos","Código de Avion","ASIENTOS VENDIDOS POR AVION")
+    labels = df_Pregunta_B.CodigodeAvion
+    Economy = df_Pregunta_B.Economy
+    Business = df_Pregunta_B.Business
+    Comfort = df_Pregunta_B.Comfort
+
+    x = np.arange(len(labels))
+    width = 0.25
+    fig, ax = plt.subplots()
+    barra1 = ax.bar(x-0.30, Economy, width, label='Economy', color='#87CEFA')
+    barra2 = ax.bar(x, Business, width, label='Business', color='#4169E1')
+    barra3 = ax.bar(x+0.30, Comfort, width, label='Comfort', color='#1E90FF')
+    ax.set_ylabel('Asientos Vendidos')
+    ax.set_xlabel('Código de Avion')
+    ax.set_title('ASIENTOS VENDIDOS POR AVION')
+    ax.set_xticks(x, labels)
+    ax.legend()
+    ax.bar_label(barra1, padding=1, fontsize=5)
+    ax.bar_label(barra2, padding=1, fontsize=5)
+    ax.bar_label(barra3, padding=1, fontsize=5)
+    ax.set_ylim(0,185000)
+    fig.tight_layout()
+    plt.show()
+    st.pyplot(fig)
     expandir = st.expander("Ver interpretacion")
     expandir.write(f"Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “773”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en las otras dos clases. Siendo así, la aeronave con mayores asientos vendidos.")
-    codigo_avion = df_PreguntaB["CodigodeAvion"]
-    economy = df_PreguntaB["Economy"]
-    business = df_PreguntaB["Business"]
-    comfort = df_PreguntaB["Comfort"]
-    
-    fig = go.Figure(data=[
-        go.Bar(name="Economy", x=codigo_avion, y=economy, marker_color="skyblue"),
-        go.Bar(name="Business", x=codigo_avion, y=business, marker_color="royalblue"),
-        go.Bar(name="Comfort", x=codigo_avion, y=comfort, marker_color="dodgerblue")
-    ])
-    fig.update_layout(barmode='stack')  # Cambia el modo de las barras
-    fig.update_layout(
-        title="Asientos Vendidos Por Avión",
-        xaxis_title="Código de Avión",
-        yaxis_title="Asientos Vendidos",
-        barmode="group"
-    )
-    st.plotly_chart(fig)
-    
-    
-    labels = df_Pregunta_B.CodigodeAvion
-    Economy = df_Pregunta_B.Economy
-    Business = df_Pregunta_B.Business
-    Comfort = df_Pregunta_B.Comfort
-
-    x = np.arange(len(labels))
-    width = 0.25
-    fig, ax = plt.subplots()
-    barra1 = ax.bar(x-0.30, Economy, width, label='Economy', color='#87CEFA')
-    barra2 = ax.bar(x, Business, width, label='Business', color='#4169E1')
-    barra3 = ax.bar(x+0.30, Comfort, width, label='Comfort', color='#1E90FF')
-    ax.set_ylabel('Asientos Vendidos')
-    ax.set_xlabel('Código de Avion')
-    ax.set_title('ASIENTOS VENDIDOS POR AVION')
-    ax.set_xticks(x, labels)
-
-    ax.legend()
-
-    ax.bar_label(barra1, padding=1, fontsize=5)
-    ax.bar_label(barra2, padding=1, fontsize=5)
-    ax.bar_label(barra3, padding=1, fontsize=5)
-
-    ax.set_ylim(0,185000)
-    fig.tight_layout()
-
-    plt.show()
-    st.pyplot(fig)
-    columnas = list(df_Pregunta_B.columns)
-    st.markdown("Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “773”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en las otras dos clases. Siendo así, la aeronave con mayores asientos vendidos.")
-
-    
-    labels = df_Pregunta_B.CodigodeAvion
-    Economy = df_Pregunta_B.Economy
-    Business = df_Pregunta_B.Business
-    Comfort = df_Pregunta_B.Comfort
-    x = np.arange(len(labels))
-    width = 0.25
-    fig, ax = plt.subplots()
-    barra1 = ax.bar(x-0.30, Economy, width, label='Economy', color='#87CEFA')
-    barra2 = ax.bar(x, Business, width, label='Business', color='#4169E1')
-    barra3 = ax.bar(x+0.30, Comfort, width, label='Comfort', color='#1E90FF')
-    ax.set_ylabel('Asientos Vendidos')
-    ax.set_xlabel('Código de Avion')
-    ax.set_title('ASIENTOS VENDIDOS POR AVION')
-    ax.set_xticks(x, labels)
-
-    ax.legend()
-
-    ax.bar_label(barra1, padding=1, fontsize=5)
-    ax.bar_label(barra2, padding=1, fontsize=5)
-    ax.bar_label(barra3, padding=1, fontsize=5)
-
-    ax.set_ylim(0,185000)
-    fig.tight_layout()
-
-    plt.show()
-    st.pyplot(fig)
-    columnas = list(df_Pregunta_B.columns)
-    expandir = st.expander("Ver interpretacion")
-    expandir.write(f"Como podemos apreciar en la gráfica, los asientos más vendidos son los de clase económica, que ocupan más del 50% de los puestos totales de cada aeronave, esto debido a que es la clase con mayor accesibilidad financiera para los pasajeros. Si nos guiamos por el avión que ha vendido una mayor cantidad de puestos, podemos ver que vendría siendo la nave cuyo código es “SU9”, el cual indica que tiene una mayor venta de puestos de clase económica, como también tuvo una mayor venta en la clase Business, mientras que el único avión en vender asientos en clase comfort fue la aeronave cuyo código es 773.")
-
 
 
 
@@ -471,7 +400,7 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     Merged_df = Df_bookings.merge(Merged_df, on='book_ref', how='inner' )
     Merged_df = Df_distancia.merge(Merged_df, on='flight_id', how='inner')
     Merged_df_new = Merged_df[["aircraft_code","range","amount","total_amount","distancia_km"]] 
-    Merged_df_new    
+    st.write(Merged_df_new)    
     correlation_matrix = Merged_df_new.select_dtypes(include=['int64', 'float64']).corr()
 
     # Crear un mapa de calor de la matriz de correlación
@@ -479,28 +408,31 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
     plt.title('Matriz de Correlación')
     plt.show()
-    sns.pairplot(Merged_df_new.select_dtypes(include=['int64', 'float64']))
+    st.pyplot(fig)
+    
+    
+    fig = sns.pairplot(Merged_df_new.select_dtypes(include=['int64', 'float64']))
     plt.show()
     st.pyplot(fig)
 
+
+
+
     # Ajustar el modelo de regresión lineal simple usando statsmodels
-    modelo = smf.ols('range ~ amount', data=Merged_df_new).fit()
+    modelo = smf.ols('distancia_km ~ amount', data=Merged_df_new).fit()
     st.write(modelo.summary())
     
-    Merged_df_new['predicted_range'] = modelo.predict(Merged_df_new['range'])
+    Merged_df_new['predicted_amount'] = modelo.predict(Merged_df_new['amount'])
 
     fig = plt.figure(figsize=(10, 6))
-    sns.scatterplot(x='range', y='amount', data=Merged_df_new, label='Datos Observados')\
-#    sns.lineplot(x='petal_length', y='predicted_sepal_length', data=Merged_df_new, color='red', label='Línea de Regresión')
-#    plt.xlabel('Petal Length')
-#    plt.ylabel('Sepal Length')
-#    plt.title('Regresión Lineal Simple: Sepal Length vs Petal Length')
+    sns.scatterplot(x='amount', y='distancia_km', data=Merged_df_new, label='Datos Observados')
+    sns.lineplot(x='amount', y='predicted_amount', data=Merged_df_new, color='red', label='Línea de Regresión')
+    plt.xlabel('Precio')
+    plt.ylabel('Distancia en km')
+    plt.title('Regresión Lineal Simple: Precio vs Km recorridos')
     plt.legend()
     plt.show()
     st.pyplot(fig)
-
-
-
     
 
 
@@ -509,38 +441,5 @@ json_extract(arrival.city, '$.en') AS Ciudad_llegada,
 
 
 
-
-
-
-
-# Seleccionar una característica para el gráfico de barras
-# feature = st.selectbox("Selecciona una característica para el gráfico de barras", iris.columns[:-1])
-
-# Gráfico de barras
-# st.write(f"Gráfico de barras de {feature}:")
-# st.area_chart(iris[feature])
-
-# Filtro por tipo de flor
-# species       = st.multiselect("Selecciona especies de Iris", iris['species'].unique(), iris['species'].unique())
-# filtered_iris = iris[iris['species'].isin(species)]
-
-# st.write(f"Datos filtrados por especies {species}:")
-# st.write(filtered_iris)
-
-# Gráfico de dispersión
-# st.write("Gráfico de dispersión (Largo de tallo vs Ancho de tallo):")
-# fig, ax = plt.subplots()
-# sns.scatterplot(data=filtered_iris, x='sepal_length', y='sepal_width', hue='species', ax=ax)
-# st.pyplot(fig)
-
-# Gráfico de pares (pairplot)
-# st.write("Gráfico de pares de las características Iris:")
-# fig = sns.pairplot(filtered_iris, hue='species')
-# st.pyplot(fig)
-
-# st.set_page_config(page_title="Statics_of_airlines", page_icon="🤖", layout="wide")
-
-#with st.container():
-#    st.subheader("Hola, :wave:")
 
 conn.close()
